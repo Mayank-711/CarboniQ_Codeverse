@@ -14,7 +14,7 @@ from datetime import date, datetime,timedelta
 import requests
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
+import google.generativeai as genai
 
 @login_required(login_url='/login/')
 def homepage(request):
@@ -347,9 +347,7 @@ def process_form(request):
         source_add = request.POST.get('source-add')
         dest_add = request.POST.get('destination-add')
 
-        print(f"[DEBUG] User: {user}, Date: {search_date}, Time: {search_time}")
-        print(f"[DEBUG] Source: ({source_lat}, {source_lng}), Destination: ({dest_lat}, {dest_lng})")
-        print(f"[DEBUG] Source Address: {source_add}, Destination Address: {dest_add}")
+    
 
         if source_lat and source_lng and dest_lat and dest_lng:
             try:
@@ -366,15 +364,15 @@ def process_form(request):
                     'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                 }
 
-                print(f"[DEBUG] OLA Maps API Request Params: {params}")
+            
 
                 # Make the API request
                 response = requests.post('https://api.olamaps.io/routing/v1/directions', params=params)
-                print(f"[DEBUG] OLA Maps API Response Code: {response.status_code}")
+            
 
                 if response.status_code == 200:
                     data = response.json()
-                    print(f"[DEBUG] OLA Maps API Response Data: {json.dumps(data, indent=2)}")
+                   
 
                     if 'routes' in data and data['routes']:
                         legs = data['routes'][0]['legs']
@@ -383,7 +381,7 @@ def process_form(request):
                         total_distance = round(total_distance, 2)
                         total_duration = round(total_duration, 2)
 
-                        print(f"[DEBUG] Total Distance: {total_distance} km, Total Duration: {total_duration} mins")
+                       
 
                         # Transport types and their CO2 emissions
                         list_of_transport = {
@@ -404,7 +402,7 @@ def process_form(request):
                         }
 
                         carbon_footprint_perkm = {mode: round(value * total_distance, 2) for mode, value in list_of_transport.items()}
-                        print(f"[DEBUG] Carbon Footprint per KM: {carbon_footprint_perkm}")
+                      
 
                         # Nearby places search
                         # ✅ Corrected Nearby Search API Request
@@ -418,25 +416,25 @@ def process_form(request):
                             'limit': 5,
                             'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                         }
-                        print(f"[DEBUG] Nearby Search API Request Params: {nearby_params}")
+                        
 
                         headers = {'accept': 'application/json'}
                         nearby_response = requests.get(url, headers=headers, params=nearby_params)
-                        print(f"[DEBUG] Nearby Places API Response Code: {nearby_response.status_code}")
+                        
 
                         nearby_bus_stops = []
                         if nearby_response.status_code == 200:
                             nearby_data = nearby_response.json()
-                            print(f"[DEBUG] Nearby Places API Response Data: {json.dumps(nearby_data, indent=2)}")
+                            
 
                             if 'predictions' in nearby_data:
                                 for place in nearby_data['predictions']:
                                     nearby_bus_stops.append(place.get('structured_formatting', {}).get('main_text', 'Unknown Place'))
                             else:
-                                print("[DEBUG] No nearby places found.")
+                                pass
 
                         nearby_bus_stops_str = ', '.join(nearby_bus_stops)
-                        print(f"[DEBUG] Nearby Bus Stops: {nearby_bus_stops_str}")
+                        
 
                         # ✅ Saving Data to Database
                         chat_entry = Chat.objects.create(
@@ -455,7 +453,7 @@ def process_form(request):
                             Nearby_Bus_Stops=nearby_bus_stops_str
                         )
 
-                        print(f"[DEBUG] Chat entry saved successfully: {chat_entry}")
+                        
                         return redirect('homepage')
 
                     else:
@@ -472,3 +470,43 @@ def process_form(request):
 
     print("[ERROR] Invalid request method.")
     return redirect('homepage')
+
+
+@login_required
+def get_user_stats(request):
+    """Returns user streak and coins as JSON."""
+    try:
+        user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        print(user_profile.streak)
+        print(user_profile.coins)
+        return JsonResponse({
+            "streak": user_profile.streak,
+            "coins": user_profile.coins
+        })
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"error": "User profile not found"}, status=404)
+    
+
+
+genai.configure(api_key="AIzaSyDmY0XB6vZIzHFhs5ijTJKfP-7PeuNg85s")
+
+@csrf_exempt  # Disable CSRF for simplicity (Better to use tokens in production)
+def chatbot_response(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Get request data
+            user_message = data.get("message", "")
+
+            if not user_message:
+                return JsonResponse({"error": "No message provided"}, status=400)
+
+            # Call Google AI Model
+            model = genai.GenerativeModel("tunedModels/carboniq-chatbot-ggspakmqlsyw")
+            response = model.generate_content(user_message)
+
+            return JsonResponse({"response": response.text})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
