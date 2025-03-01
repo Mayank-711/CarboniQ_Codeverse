@@ -33,6 +33,7 @@
     max-width: 66%;
     box-sizing: border-box;
     order: 2; /* Explicitly set order to ensure it's second */
+    border-radius: 16px;
 }
 
 /* Update the responsive behavior to maintain left/right positions when possible */

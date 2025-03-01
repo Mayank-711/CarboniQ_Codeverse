@@ -92,6 +92,22 @@
     pointer-events: none;
 }
 
+.wrapper{
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color:  #00412A;
+    width: 100%;
+    /* margin-top: 100px; */
+}
+
+.heading-text{
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 .profile-container {
     display: flex;
     flex-wrap: wrap;
