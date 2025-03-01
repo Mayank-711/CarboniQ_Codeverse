@@ -1,3 +1,14 @@
+:root {
+    --green-primary: #00563B;
+    --green-light: #E5F6DF;
+    --green-accent: #27AE60;
+    --text-color: #E5F6DF;
+    --highlight-text: #FAFAFA;
+    --card-bg: #FFFFFF;
+    --card-border: #A9DFBF;
+    --linear:linear-gradient(135deg, #27AE60 0%, #00563B 100%);
+}
+
 body {
     font-family: 'Inter', 'Arial', sans-serif;
     margin: 0;
@@ -6,7 +17,7 @@ body {
     flex-direction: column;
     height: 100vh;
     justify-content: space-between;
-    background-color: #e7f7ef;
+    background-color: var(--green-light);
     color: #1a332b;
 }
 
@@ -16,9 +27,14 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #00563B;
     color: #E5F6DF;
+    background: linear-gradient(to bottom, #7fcd65 0%, transparent 100%);
     
+}
+.navbar.scrolled {
+    background-color: var(--green-primary);
+    padding: 15px 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .navbar .logo {
@@ -33,13 +49,12 @@ body {
 .navbar h1 {
     color: #E5F6DF;
     margin-left: 10px;
-    padding-top: 20px;
+    padding-top: 10px;
 }
 
 .navbar .nav-links {
     display: flex;
     gap: 20px;
-    padding-top: 20px;
 }
 
 .navbar .nav-links ul {
