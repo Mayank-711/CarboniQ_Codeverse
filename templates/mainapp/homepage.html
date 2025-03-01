@@ -52,7 +52,62 @@
         </div>
     </div>
 </div>
+<div id="row">
+    <div class="form-container">
+        <h2>Plan Your Trip</h2>
+        <form id="trip-form" action="{% url 'process_form' %}" method="post">
+            {% csrf_token %}
+            <label for="source">Source</label>
+            <input type="text" id="source-input" name="source-add" placeholder="Enter source location" required />
+            <ul id="source-results" class="autocomplete-results"></ul>
+            <input type="hidden" id="source-lat" name="source_lat">
+            <input type="hidden" id="source-lng" name="source_lng">
 
+            <label for="destination">Destination</label>
+            <input type="text" id="destination-input" name="destination-add" placeholder="Enter destination location" required />
+            <ul id="destination-results" class="autocomplete-results"></ul>
+            <input type="hidden" id="dest-lat" name="dest_lat">
+            <input type="hidden" id="dest-lng" name="dest_lng">
+
+            <!-- Hidden fields for date and time -->
+            <input type="hidden" id="search-date" name="search_date">
+            <input type="hidden" id="search-time" name="search_time">
+
+            <button type="submit" id="calculate-button">Calculate Carbon Footprint</button>
+        </form>
+    </div>
+    <div class="chats">
+        <div class="chat-entries">
+            {% if chats %}
+                {% for chat in chats %}
+                <div class="chat-entry">
+                    <div class="chat-row">
+                        <div class="chat-column">
+                            <p><strong>Source:</strong> {{ chat.source_address }}</p>
+                            <p><strong>Destination:</strong> {{ chat.destination_address }}</p>
+                            <p><strong>Distance:</strong> {{ chat.distance }} km</p>
+                            <p><strong>Duration:</strong> {{ chat.duration }} mins</p>
+                            <p><strong>Date:</strong> {{ chat.search_date }}</p>
+                            <p><strong>Time:</strong> {{ chat.search_time }}</p>
+                            <p><strong>Nearby Bus Stops :</strong>{{ chat.Nearby_Bus_Stops }}</p>
+                        </div>
+                        <div class="chat-column">
+                            <div class="carbon-footprint">
+                                <p><strong>Carbon Footprint:</strong></p>
+                                {% for mode, footprint in chat.carbon_footprint.items %}
+                                    <p>{{ mode }}: {{ footprint }} g</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No records found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Data from Django Backend
@@ -147,6 +202,57 @@
             }
         });
 
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const sourceAddress = document.getElementById('source-input');
+        const sourceResults = document.getElementById('source-results');
+        const destAddress = document.getElementById('destination-input');
+        const destResults = document.getElementById('destination-results');
+        const OLAMAPS_API = "upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y";
+        
+    
+        // Add event listeners for autocomplete as before
+        async function fetchPredictions(input, resultsContainer, setCoordinates) {
+            const searchText = input.value.trim();
+            if (searchText.length > 2) {
+                try {
+                    const response = await fetch(`https://api.olamaps.io/places/v1/autocomplete?input=${encodeURIComponent(searchText)}&api_key=${OLAMAPS_API}`);
+                    const data = await response.json();
+                    const predictions = data.predictions || [];
+                    resultsContainer.innerHTML = '';
+                    resultsContainer.style.display = predictions.length > 0 ? 'block' : 'none';
+                    predictions.forEach((prediction) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = prediction.description;
+                        listItem.addEventListener('click', () => {
+                            input.value = prediction.description;
+                            setCoordinates(prediction.geometry.location.lat, prediction.geometry.location.lng);
+                            resultsContainer.style.display = 'none';
+                        });
+                        resultsContainer.appendChild(listItem);
+                    });
+                } catch (error) {
+                    console.error("Error fetching predictions:", error);
+                }
+            } else {
+                resultsContainer.style.display = 'none';
+            }
+        }
+    
+        sourceAddress.addEventListener('input', () => {
+            fetchPredictions(sourceAddress, sourceResults, (lat, lng) => {
+                document.getElementById('source-lat').value = lat;
+                document.getElementById('source-lng').value = lng;
+            });
+        });
+    
+        destAddress.addEventListener('input', () => {
+            fetchPredictions(destAddress, destResults, (lat, lng) => {
+                document.getElementById('dest-lat').value = lat;
+                document.getElementById('dest-lng').value = lng;
+            });
+        });
     });
 </script>
 {% endblock %}

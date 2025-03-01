@@ -30,6 +30,7 @@ mainappurl = [
      path('homepage/', mviews.homepage, name='homepage'),
     path('logtrip/', mviews.logtrip, name='logtrip'),
     path('leaderboards/', mviews.leaderboards, name='leaderboards'),
+    path ('process_form/',mviews.process_form,name='process_form'),
 ]
 
 authappurl = [
