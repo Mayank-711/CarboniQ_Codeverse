@@ -1,36 +1,19 @@
 {% extends 'mainapp/base.html' %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Daily Challenge{% endblock %}
 
 {% block extra_head %}
 <style>
-    .daily-challenge-box {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 20px;
-        background: #fff;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        text-align: center;
+    /* General Styles */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
     }
-    .daily-challenge-box h3 { color: #007bff; }
-    .challenge-status { font-weight: bold; margin-bottom: 10px; }
-    .completed { color: green; }
-    .not-completed { color: red; }
-    .btn-complete {
-        background: #28a745;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background 0.3s ease;
-    }
-    .btn-complete:hover { background: #218838; }
-    .btn-complete:disabled { background: gray; cursor: not-allowed; }
 
+    /* Message Box */
     .messages {
         list-style-type: none;
         padding: 10px;
@@ -42,9 +25,156 @@
         padding: 10px;
         border-radius: 5px;
         margin-bottom: 5px;
+        font-weight: bold;
     }
     .messages .success { background: #d4edda; color: #155724; }
     .messages .error { background: #f8d7da; color: #721c24; }
+
+    /* Daily Challenge Box */
+    .daily-challenge-box {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+    .daily-challenge-box h3 { color: #007bff; }
+    .challenge-status { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+    .completed {
+        background: green;
+        color: white !important;  /* Ensure text remains visible */
+        font-weight: bold;
+    }    
+    .not-completed { color: red; }
+    .btn-complete {
+        background: #28a745;
+        color: white;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s ease-in-out;
+    }
+    .btn-complete:hover { background: #218838; }
+    .btn-complete:disabled { background: gray; cursor: not-allowed; }
+
+    /* Tracker */
+    .daily-challenge-box {
+        max-width: 450px;
+        margin: 50px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+    .daily-challenge-box h3 { color: #007bff; }
+    .challenge-status { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+    .completed {
+        background: green;
+        color: white !important;
+        font-weight: bold;
+    }
+    .not-completed { color: red; }
+    .btn-complete {
+        background: #28a745;
+        color: white;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s ease-in-out;
+    }
+    .btn-complete:hover { background: #218838; }
+    .btn-complete:disabled { background: gray; cursor: not-allowed; }
+
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+    }
+
+    /* Table Container */
+    .table-container {
+        width: 90%;
+        max-width: 800px;
+        margin: 40px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        overflow-x: auto;
+    }
+
+    h2 {
+        text-align: center;
+        color: #007bff;
+        margin-bottom: 20px;
+    }
+
+    /* Table Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        background: white;
+    }
+
+    thead {
+        background: #5bb779;
+        color: white;
+    }
+
+    th, td {
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        font-size: 16px;
+        text-transform: uppercase;
+    }
+
+    /* Alternating row colors */
+    tbody tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+
+    tbody tr:hover {
+        background: #e6f7ff;
+        transition: 0.3s ease-in-out;
+    }
+
+    /* Status styling */
+    .status {
+        font-weight: bold;
+        padding: 8px 10px;
+        border-radius: 6px;
+    }
+
+    .completed {
+        background: #28a745;
+        color: white;
+    }
+
+    .not-completed {
+        background: #dc3545;
+        color: white;
+    }
+
+    /* Responsive Table */
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+        th, td {
+            padding: 10px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -57,6 +187,7 @@
     {% endfor %}
 </ul>
 
+<!-- Daily Challenge Box -->
 <div id="dailyChallengeBox" class="daily-challenge-box">
     <h3>Today's Challenge</h3>
     <p id="challengeTitle">Loading...</p>
@@ -66,20 +197,52 @@
     <button id="completeChallengeBtn" class="btn-complete">Mark as Completed</button>
 </div>
 
+<!-- Tracker Section -->
+<h2 style="text-align: center;">Daily Challenge Tracker</h2>
+
+<table border="1" width="80%" align="center" style="border-collapse: collapse; text-align: center;">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Title</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for challenge in challenges %}
+        <tr>
+            <td>{{ challenge.assigned_date }}</td>
+            <td>{{ challenge.challenge.title }}</td>
+            <td>
+                {% if challenge.completed %}
+                    ✅ Completed
+                {% else %}
+                    ❌ Not Completed
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No challenges found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
 <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        await fetchChallenge();
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchChallenge();
     });
-    
+
     async function fetchChallenge() {
         try {
             const response = await fetch("{% url 'daily_challenge_view' %}", { method: "GET" });
             if (!response.ok) throw new Error("Failed to fetch challenge");
-    
+
             const data = await response.json();
             document.getElementById("challengeTitle").textContent = data.challenge;
             document.getElementById("challengeDesc").textContent = data.description;
-    
+
             if (data.completed) {
                 updateUI(true);
             }
@@ -87,30 +250,30 @@
             console.error("Error fetching daily challenge:", error);
         }
     }
-    
+
     document.getElementById("completeChallengeBtn").addEventListener("click", async function () {
         try {
             const response = await fetch("{% url 'daily_challenge_view' %}", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
-    
+
             const data = await response.json();
             if (data.success) {
                 updateUI(true);
-                alert(data.message);  // 🎉 Show success message
+                showToast(data.message, "success");
             } else {
-                alert("⚠️ " + data.message);
+                showToast("⚠️ " + data.message, "error");
             }
         } catch (error) {
             console.error("Error completing challenge:", error);
         }
     });
-    
+
     function updateUI(isCompleted) {
         const statusText = document.getElementById("challengeStatus");
         const completeBtn = document.getElementById("completeChallengeBtn");
-    
+
         if (isCompleted) {
             statusText.textContent = "Status: Completed ✅";
             statusText.classList.add("completed");
@@ -118,12 +281,16 @@
             completeBtn.disabled = true;
         }
     }
-    
-    // Auto-hide messages after 3 seconds
-    setTimeout(() => {
-        document.querySelectorAll(".messages li").forEach(el => el.style.display = "none");
-    }, 3000);
-    
+
+    function showToast(message, type) {
+        const toast = document.createElement("li");
+        toast.textContent = message;
+        toast.className = type === "success" ? "success" : "error";
+
+        document.querySelector(".messages").appendChild(toast);
+
+        setTimeout(() => toast.style.display = "none", 3000);
+    }
 </script>
 
 {% endblock %}

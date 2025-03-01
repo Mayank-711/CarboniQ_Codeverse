@@ -391,17 +391,17 @@ def process_form(request):
                         list_of_transport = {
                             "Bus": 50, "Electric Bus": 10, "AC Bus": 80, "Electric AC Bus": 10,
                             "Train": 41, "Electric Train": 10, "AC Train": 50, "Electric AC Train": 10,
-                            "Car 1 Passenger": 128, "Electric Car 1 Passenger": 20,
-                            "Car 2 Passenger": 64, "Electric Car 2 Passenger": 20,
-                            "Car 3 Passenger": 48, "Electric Car 3 Passenger": 20,
+                            "Car 1 Passenger": 128, "Electric Car 1 Passenger": 80,
+                            "Car 2 Passenger": 64, "Electric Car 2 Passenger": 50,
+                            "Car 3 Passenger": 48, "Electric Car 3 Passenger": 30,
                             "Car 4 Passenger": 32, "Electric Car 4 Passenger": 20,
                             "Bike 1 Passenger": 50, "Electric Bike 1 Passenger": 20,
                             "Bike 2 Passenger": 40, "Electric Bike 2 Passenger": 20,
-                            "Rickshaw 1 Passenger": 100, "Electric Rickshaw 1 Passenger": 10,
-                            "Rickshaw 2 Passenger": 80, "Electric Rickshaw 2 Passenger": 10,
+                            "Rickshaw 1 Passenger": 100, "Electric Rickshaw 1 Passenger": 30,
+                            "Rickshaw 2 Passenger": 80, "Electric Rickshaw 2 Passenger": 20,
                             "Rickshaw 3 Passenger": 70, "Electric Rickshaw 3 Passenger": 10,
                             "Scooter 1 Passenger": 50, "Electric Scooter 1 Passenger": 20,
-                            "Scooter 2 Passenger": 40, "Electric Scooter 2 Passenger": 20,
+                            "Scooter 2 Passenger": 40, "Electric Scooter 2 Passenger": 10,
                             "Walk": 0, "Bicycle": 0
                         }
 
@@ -523,7 +523,7 @@ from django.db import transaction
 @csrf_exempt  
 def daily_challenge_view(request):
     user = request.user
-    today = now().date()
+    today = timezone.localtime(timezone.now()).date()
 
     # Ensure the user has a profile
     profile, created = UserProfile.objects.get_or_create(user=user)
@@ -566,4 +566,11 @@ def daily_challenge_view(request):
 
 @login_required
 def dailychallenge(request):
-    return render(request, 'mainapp/dailychallenge.html')
+    user = request.user
+
+    # Fetch all challenges for the user, ordered by date (ascending)
+    challenges = UserChallenge.objects.filter(user=user).order_by("assigned_date")
+
+    return render(request, 'mainapp/dailychallenge.html', {
+        "challenges": challenges
+    })
