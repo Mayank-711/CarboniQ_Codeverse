@@ -80,8 +80,7 @@ def homepage(request):
         'public_trips': public_trips,
         'total_co2_emission': total_co2_emission
     }
-    last_chat = Chat.objects.filter(user=user)
-    print(last_chat)
+    last_chat = Chat.objects.filter(user=user).order_by('-search_date', '-search_time').first()
     return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data),'chats':last_chat})
 
 
