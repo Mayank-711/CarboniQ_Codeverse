@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- AOS Animations -->
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="{% static 'css/chatbot.css' %}" rel="stylesheet">
 </head>
 
 <body>
@@ -36,7 +37,7 @@
                         <a class="nav-link" href="#about" data-aos="fade-left" data-aos-delay="100">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}" data-aos="fade-left" data-aos-delay="300" >Login</a>
+                        <a class="nav-link" href="{% url 'login' %}" data-aos="fade-left" data-aos-delay="300" style="background-color: white; border-radius: 15px; color: green;width:80px;padding-left:10px">LOGIN</a>
                     </li>
                 </ul>
             </div>
@@ -76,7 +77,22 @@
             </svg>
         </div>
     </section>
+    <div class="fab" onclick="toggleChatbot()">💬</div>
 
+    <!-- Chatbot -->
+    <div class="chatbot-container" id="chatbot">
+        <div class="chatbot-header">
+            <span>Chatbot</span>
+            <button onclick="toggleChatbot()">✖</button>
+        </div>
+        <div class="chatbot-body" id="chatBody">
+            <p><strong>Bot:</strong> Hello! How can I assist you?</p>
+        </div>
+        <div class="chatbot-footer">
+            <input type="text" id="userInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
     <!-- Enhanced Eco-Importance Section -->
     <section id="eco-importance" class="section">
         <div class="container">
@@ -215,6 +231,40 @@
                 navbar.classList.remove('scrolled');
             }
         });
+
+
+        function toggleChatbot() {
+            const chatbot = document.getElementById("chatbot");
+            chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const chatBody = document.getElementById("chatBody");
+            const userMessage = inputField.value.trim();
+
+            if (userMessage !== "") {
+                chatBody.innerHTML += `<p><strong>You:</strong> ${userMessage}</p>`;
+                inputField.value = "";
+
+                try {
+                    const response = await fetch("/chatbot-response/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: userMessage })
+                    });
+
+                    const data = await response.json();
+                    chatBody.innerHTML += `<p><strong>Bot:</strong> ${data.response || "No response"} 😊</p>`;
+                } catch (error) {
+                    chatBody.innerHTML += `<p><strong>Bot:</strong> Error fetching response ❌</p>`;
+                }
+
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+    
+
     </script>
 </body>
 </html>

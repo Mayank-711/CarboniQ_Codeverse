@@ -14,7 +14,7 @@ from datetime import date, datetime,timedelta
 import requests
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-
+import google.generativeai as genai
 
 @login_required(login_url='/login/')
 def homepage(request):
@@ -106,16 +106,6 @@ def logtrip(request):
         api_distance = float(request.POST.get("calculated_distance", "0"))  # in kilometers
         api_duration = float(request.POST.get("calculated_duration", "0"))  # in minutes
 
-        # Debugging logs
-        # print("==== LOG TRIP DATA ====")
-        # print("Source:", source_address, "Coordinates:", f"{source_lat}, {source_lng}")
-        # print("Destination:", destination_address, "Coordinates:", f"{dest_lat}, {dest_lng}")
-        # print("Mode of Transport:", mode_of_transport)
-        # print("Electric Vehicle:", electric_vehicle)
-        # print("Passengers (Before Adjustment):", passengers)
-        # print("Distance (API):", api_distance, "km, Time Taken (API):", api_duration, "mins")
-        # print("Time Taken (User Entered):", time_taken, "User:", user)
-
         # Adjust passenger count for public transport
         public_transports = ["bus", "train", "metro", "actrain", "acbus"]
         if mode_of_transport in public_transports:
@@ -129,26 +119,14 @@ def logtrip(request):
         if electric_vehicle and mode_of_transport not in ["actrain", "acbus", "etrain"]:
             mode_of_transport = "e" + mode_of_transport
 
-        # Call the prediction function
+        # Call the CO2 prediction function
         predicted_co2 = round(get_predictions(mode_of_transport, passengers, api_distance, api_duration, time_taken), 2)
-        # Debugging output
-        # print("Final Mode of Transport:", mode_of_transport)
-        # print("Passengers (Adjusted):", passengers)
-        # print(f"Predicted CO2 Emission: {predicted_co2:.2f}g")
-        public_transport_option = False
-        greener_travel = False
-        public_transports = ["bus", "ebus", "acbus", "eacbus", "etrain", "actrain"]
-        if mode_of_transport in public_transports:
-            public_transport_option = True
-            greener_travel = True
 
-        if mode_of_transport[0] == "e":
-            greener_travel = True
-        if mode_of_transport == "walk" or mode_of_transport == "cycle":
-            greener_travel = True
-        if passengers > 3:
-            greener_travel = True
-        
+        # Determine greener travel options
+        public_transport_option = mode_of_transport in ["bus", "ebus", "acbus", "eacbus", "etrain", "actrain"]
+        greener_travel = public_transport_option or mode_of_transport.startswith("e") or mode_of_transport in ["walk", "cycle"] or passengers > 3
+
+        # Create a new trip log
         TripLog.objects.create(
             user=user,
             source_address=source_address,
@@ -168,38 +146,57 @@ def logtrip(request):
             public_transport=public_transport_option,
             greener_travel=greener_travel
         )
-        today = timezone.now().date() 
+
+        # Streak & Coin Logic
+        today = timezone.now().date()
         print(f"[DEBUG] Today's Date: {today}")
 
+        try:
+            user_profile = UserProfile.objects.get(user=user)
+        except UserProfile.DoesNotExist:
+            messages.error(request, 'User profile not found. Contact support.')
+            return redirect('logtrip')
+
+        # Check for existing trips today
         existing_trips = TripLog.objects.filter(user=user, date=today)
         print(f"[DEBUG] Existing trips for today: {[trip.id for trip in existing_trips]}")
+
+        # Get last trip (to check for streak breaking)
+        last_trip = TripLog.objects.filter(user=user).order_by('-date').first()
+        print(f"[DEBUG] Last Trip Date: {last_trip.date if last_trip else 'No trips yet'}")
+
+        # Streak Breaking Logic
+        if last_trip:
+            last_trip_date = last_trip.date
+            streak_continues = (today - last_trip_date).days == 1
+            missed_day = (today - last_trip_date).days > 1
+
+            if missed_day:
+                print("[DEBUG] Streak broken! Resetting streak to 0.")
+                user_profile.streak = 0
+                messages.warning(request, "Your streak was broken! Start again.")
+
+        # Award Coins Only for First Trip of the Day
         if existing_trips.count() == 1:
-            print("[DEBUG] No previous trips found for today, awarding coins.")
-            try:
-                user_profile = UserProfile.objects.get(user=user)
-                print(f"[DEBUG] Current Coins: {user_profile.coins}")
-                user_profile.coins += 50 
-                user_profile.streak +=1
-                user_profile.save()
-                print(f"[DEBUG] New Coins after Award: {user_profile.coins}")
-                messages.success(request, 'You earned 50 coins for your first trip today!')
-                messages.success(request, 'Your streak was increased 1')
-            except UserProfile.DoesNotExist:
-                messages.error(request, 'User profile not found. Contact support.')
-                return redirect('logtrip')
+            print("[DEBUG] First trip of the day, awarding coins and updating streak.")
+            user_profile.coins += 50
+            user_profile.streak += 1
+            user_profile.save()
+            messages.success(request, 'You earned 50 coins for your first trip today!')
+            messages.success(request, f'Your streak is now {user_profile.streak} days!')
+
         else:
             print("[DEBUG] Trip already logged for today.")
+
         messages.success(request, "Trip Logged Successfully!")
         return redirect("logtrip")
-    
-    trip_logs = TripLog.objects.filter(user=user).order_by("-date", "-created_at") 
 
-    # Paginate (5 logs per page)
+    # Fetch all trips for the user and paginate (5 logs per page)
+    trip_logs = TripLog.objects.filter(user=user).order_by("-date", "-created_at") 
     paginator = Paginator(trip_logs, 5)
-    page_number = request.GET.get("page")  # Get the page number from URL
+    page_number = request.GET.get("page")
     trip_logs_page = paginator.get_page(page_number)
 
-    
     return render(request, "mainapp/logtrip.html", {"trip_logs": trip_logs_page})
 
 
@@ -350,9 +347,7 @@ def process_form(request):
         source_add = request.POST.get('source-add')
         dest_add = request.POST.get('destination-add')
 
-        print(f"[DEBUG] User: {user}, Date: {search_date}, Time: {search_time}")
-        print(f"[DEBUG] Source: ({source_lat}, {source_lng}), Destination: ({dest_lat}, {dest_lng})")
-        print(f"[DEBUG] Source Address: {source_add}, Destination Address: {dest_add}")
+    
 
         if source_lat and source_lng and dest_lat and dest_lng:
             try:
@@ -369,15 +364,15 @@ def process_form(request):
                     'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                 }
 
-                print(f"[DEBUG] OLA Maps API Request Params: {params}")
+            
 
                 # Make the API request
                 response = requests.post('https://api.olamaps.io/routing/v1/directions', params=params)
-                print(f"[DEBUG] OLA Maps API Response Code: {response.status_code}")
+            
 
                 if response.status_code == 200:
                     data = response.json()
-                    print(f"[DEBUG] OLA Maps API Response Data: {json.dumps(data, indent=2)}")
+                   
 
                     if 'routes' in data and data['routes']:
                         legs = data['routes'][0]['legs']
@@ -386,7 +381,7 @@ def process_form(request):
                         total_distance = round(total_distance, 2)
                         total_duration = round(total_duration, 2)
 
-                        print(f"[DEBUG] Total Distance: {total_distance} km, Total Duration: {total_duration} mins")
+                       
 
                         # Transport types and their CO2 emissions
                         list_of_transport = {
@@ -407,7 +402,7 @@ def process_form(request):
                         }
 
                         carbon_footprint_perkm = {mode: round(value * total_distance, 2) for mode, value in list_of_transport.items()}
-                        print(f"[DEBUG] Carbon Footprint per KM: {carbon_footprint_perkm}")
+                      
 
                         # Nearby places search
                         # ✅ Corrected Nearby Search API Request
@@ -421,25 +416,25 @@ def process_form(request):
                             'limit': 5,
                             'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                         }
-                        print(f"[DEBUG] Nearby Search API Request Params: {nearby_params}")
+                        
 
                         headers = {'accept': 'application/json'}
                         nearby_response = requests.get(url, headers=headers, params=nearby_params)
-                        print(f"[DEBUG] Nearby Places API Response Code: {nearby_response.status_code}")
+                        
 
                         nearby_bus_stops = []
                         if nearby_response.status_code == 200:
                             nearby_data = nearby_response.json()
-                            print(f"[DEBUG] Nearby Places API Response Data: {json.dumps(nearby_data, indent=2)}")
+                            
 
                             if 'predictions' in nearby_data:
                                 for place in nearby_data['predictions']:
                                     nearby_bus_stops.append(place.get('structured_formatting', {}).get('main_text', 'Unknown Place'))
                             else:
-                                print("[DEBUG] No nearby places found.")
+                                pass
 
                         nearby_bus_stops_str = ', '.join(nearby_bus_stops)
-                        print(f"[DEBUG] Nearby Bus Stops: {nearby_bus_stops_str}")
+                        
 
                         # ✅ Saving Data to Database
                         chat_entry = Chat.objects.create(
@@ -458,7 +453,7 @@ def process_form(request):
                             Nearby_Bus_Stops=nearby_bus_stops_str
                         )
 
-                        print(f"[DEBUG] Chat entry saved successfully: {chat_entry}")
+                        
                         return redirect('homepage')
 
                     else:
@@ -475,3 +470,43 @@ def process_form(request):
 
     print("[ERROR] Invalid request method.")
     return redirect('homepage')
+
+
+@login_required
+def get_user_stats(request):
+    """Returns user streak and coins as JSON."""
+    try:
+        user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        print(user_profile.streak)
+        print(user_profile.coins)
+        return JsonResponse({
+            "streak": user_profile.streak,
+            "coins": user_profile.coins
+        })
+    except UserProfile.DoesNotExist:
+        return JsonResponse({"error": "User profile not found"}, status=404)
+    
+
+
+genai.configure(api_key="AIzaSyDmY0XB6vZIzHFhs5ijTJKfP-7PeuNg85s")
+
+@csrf_exempt  # Disable CSRF for simplicity (Better to use tokens in production)
+def chatbot_response(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Get request data
+            user_message = data.get("message", "")
+
+            if not user_message:
+                return JsonResponse({"error": "No message provided"}, status=400)
+
+            # Call Google AI Model
+            model = genai.GenerativeModel("tunedModels/carboniq-chatbot-ggspakmqlsyw")
+            response = model.generate_content(user_message)
+
+            return JsonResponse({"response": response.text})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
