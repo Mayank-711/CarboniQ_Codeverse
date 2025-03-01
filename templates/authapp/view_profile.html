@@ -1,0 +1,133 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/viewprofile.css'%}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <!-- Profile Information Section -->
+        <div class="profile-info">
+            <!-- Handle avatar with a fallback for missing or invalid values -->
+            {% if profile.avatar == '1' %}
+                <img src="{% static 'avatar/kid.jpg' %}" alt="Avatar 1" class="avatar">
+            {% elif profile.avatar == '2' %}
+                <img src="{% static 'avatar/men.jpg' %}" alt="Avatar 2" class="avatar">
+            {% elif profile.avatar == '3' %}
+                <img src="{% static 'avatar/girl1.jpg' %}" alt="Avatar 3" class="avatar">
+            {% elif profile.avatar == '4' %}
+                <img src="{% static 'avatar/girl2.jpg' %}" alt="Avatar 4" class="avatar">
+            {% elif profile.avatar == '5' %}
+                <img src="{% static 'avatar/girl3.jpg' %}" alt="Avatar 5" class="avatar">
+            {% elif profile.avatar == '6' %}
+                <img src="{% static 'avatar/girl4.jpg' %}" alt="Avatar 6" class="avatar">
+            {% elif profile.avatar == '7' %}
+                <img src="{% static 'avatar/boy1.jpg' %}" alt="Avatar 7" class="avatar">
+            {% elif profile.avatar == '8' %}
+                <img src="{% static 'avatar/boy2.jpg' %}" alt="Avatar 8" class="avatar">
+            {% elif profile.avatar == '9' %}
+                <img src="{% static 'avatar/ninja.jpg' %}" alt="Avatar 9" class="avatar">
+            {% else %}
+                <img src="{% static 'avatar/default.jpg' %}" alt="Default Avatar" class="avatar">
+            {% endif %}
+            <a href="{% url 'avatar_selection' %}" class="avatar-selection-button">Change Avatar</a>
+            <div>
+                <h1>{{ user.username }}'s Profile</h1>
+                <p><strong>Name:</strong> {{ user.first_name }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Contact:</strong> {{ profile.contact }}</p>
+                <p><strong>Pincode:</strong> {{ profile.pincode }}</p>
+                <a href="{% url 'edit_profile' user.id %}">Edit Profile</a>
+            </div>
+        </div>
+
+        <!-- Friend Requests Section -->
+        <div class="friend-requests">
+            <h2>Friend Requests</h2>
+            {% if received_requests %}
+                <ul>
+                    {% for request in received_requests %}
+                        <li>
+                            <!-- Optionally add friend's avatar if available -->
+                            {% if request.from_user.userprofile.avatar == '1' %}
+                                <img src="{% static 'avatar/kid.jpg' %}" alt="Avatar 1" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '2' %}
+                                <img src="{% static 'avatar/men.jpg' %}" alt="Avatar 2" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '3' %}
+                                <img src="{% static 'avatar/girl1.jpg' %}" alt="Avatar 3" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '4' %}
+                                <img src="{% static 'avatar/girl2.jpg' %}" alt="Avatar 4" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '5' %}
+                                <img src="{% static 'avatar/girl3.jpg' %}" alt="Avatar 5" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '6' %}
+                                <img src="{% static 'avatar/girl4.jpg' %}" alt="Avatar 6" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '7' %}
+                                <img src="{% static 'avatar/boy1.jpg' %}" alt="Avatar 7" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '8' %}
+                                <img src="{% static 'avatar/boy2.jpg' %}" alt="Avatar 8" class="avatar">
+                            {% elif request.from_user.userprofile.avatar == '9' %}
+                                <img src="{% static 'avatar/ninja.jpg' %}" alt="Avatar 9" class="avatar">
+                            {% else %}
+                                <img src="{% static 'avatar/default.jpg' %}" alt="Default Avatar" class="avatar">
+                            {% endif %}
+                            <span>{{ request.from_user.username }}</span>
+                            <div>
+                                <a href="{% url 'accept_request' request_id=request.id %}">
+                                    <button>Accept</button>
+                                </a>
+                                <a href="{% url 'decline_request' request_id=request.id %}">
+                                    <button>Decline</button>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have no friend requests.</p>
+            {% endif %}
+        </div>
+
+        <!-- Friends List Section -->
+        <div class="friends-list">
+            <h2>Friends</h2>
+            <ul>
+                {% if friends %}
+                    {% for friend in friends %}
+                        <li>
+                            <!-- Display friend's avatar -->
+                            {% if friend.userprofile.avatar == '1' %}
+                                <img src="{% static 'avatar/kid.jpg' %}" alt="Avatar 1" class="avatar">
+                            {% elif friend.userprofile.avatar == '2' %}
+                                <img src="{% static 'avatar/men.jpg' %}" alt="Avatar 2" class="avatar">
+                            {% elif friend.userprofile.avatar == '3' %}
+                                <img src="{% static 'avatar/girl1.jpg' %}" alt="Avatar 3" class="avatar">
+                            {% elif friend.userprofile.avatar == '4' %}
+                                <img src="{% static 'avatar/girl2.jpg' %}" alt="Avatar 4" class="avatar">
+                            {% elif friend.userprofile.avatar == '5' %}
+                                <img src="{% static 'avatar/girl3.jpg' %}" alt="Avatar 5" class="avatar">
+                            {% elif friend.userprofile.avatar == '6' %}
+                                <img src="{% static 'avatar/girl4.jpg' %}" alt="Avatar 6" class="avatar">
+                            {% elif friend.userprofile.avatar == '7' %}
+                                <img src="{% static 'avatar/boy1.jpg' %}" alt="Avatar 7" class="avatar">
+                            {% elif friend.userprofile.avatar == '8' %}
+                                <img src="{% static 'avatar/boy2.jpg' %}" alt="Avatar 8" class="avatar">
+                            {% elif friend.userprofile.avatar == '9' %}
+                                <img src="{% static 'avatar/ninja.jpg' %}" alt="Avatar 9" class="avatar">
+                            {% else %}
+                                <img src="{% static 'avatar/default.jpg' %}" alt="Default Avatar" class="avatar">
+                            {% endif %}
+                            {{ friend.username }}
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <p>You have no friends yet.</p>
+                {% endif %}
+            </ul>
+            <a href="{% url 'friends_list' %}">Find More Friends</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
