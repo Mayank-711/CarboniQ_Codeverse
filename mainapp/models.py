@@ -1,6 +1,8 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
+import random
+from datetime import date
 
 class TripLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trips")
@@ -47,3 +49,25 @@ class Chat(models.Model):
     def __str__(self):
         return f"Trip from {self.source_address} to {self.destination_address} on {self.search_date}"
     
+
+
+class Challenge(models.Model):
+    title = models.CharField(max_length=255, unique=True)
+    description = models.TextField()
+    points = models.IntegerField(default=10)
+    created_at = models.DateTimeField(auto_now_add=True)  # ✅ This will automatically set the timestamp
+
+    def __str__(self):
+        return self.title
+
+class UserChallenge(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    assigned_date = models.DateField(default=date.today)
+    completed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'assigned_date')  # Ensure one challenge per day
+
+    def __str__(self):
+        return f"{self.user.username} - {self.challenge.title} ({self.assigned_date})"

@@ -1,5 +1,6 @@
 from collections import defaultdict
 import json
+import random
 from django.http import JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
@@ -15,6 +16,9 @@ import requests
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import google.generativeai as genai
+from .models import Challenge, UserChallenge
+
+
 
 @login_required(login_url='/login/')
 def homepage(request):
@@ -510,3 +514,56 @@ def chatbot_response(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+from django.db import transaction
+
+@login_required
+@csrf_exempt  
+def daily_challenge_view(request):
+    user = request.user
+    today = now().date()
+
+    # Ensure the user has a profile
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == "GET":
+        """Fetches today's challenge for the user"""
+        user_challenge, created = UserChallenge.objects.get_or_create(
+            user=user, assigned_date=today,
+            defaults={"challenge": random.choice(Challenge.objects.all())}
+        )
+        return JsonResponse({
+            "challenge": user_challenge.challenge.title,
+            "description": user_challenge.challenge.description,
+            "completed": user_challenge.completed
+        })
+
+    elif request.method == "POST":
+        """Marks the challenge as completed and rewards points"""
+        try:
+            user_challenge = UserChallenge.objects.get(user=user, assigned_date=today)
+
+            if user_challenge.completed:
+                return JsonResponse({"success": False, "message": "Challenge already completed!"})
+
+            with transaction.atomic():
+                user_challenge.completed = True
+                user_challenge.save(update_fields=["completed"])
+
+                # ✅ Use the profile retrieved earlier to avoid "no attribute 'profile'"
+                profile.coins += 10
+                profile.save(update_fields=["coins"])
+
+            return JsonResponse({"success": True, "message": "🎉 Challenge completed! You earned 10 coins."})
+
+        except UserChallenge.DoesNotExist:
+            return JsonResponse({"success": False, "message": "No challenge assigned for today!"})
+
+    return JsonResponse({"success": False, "message": "Invalid request!"})
+
+
+@login_required
+def dailychallenge(request):
+    return render(request, 'mainapp/dailychallenge.html')
