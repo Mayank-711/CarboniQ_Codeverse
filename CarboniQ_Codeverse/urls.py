@@ -32,7 +32,11 @@ mainappurl = [
     path('leaderboards/', mviews.leaderboards, name='leaderboards'),
     path ('process_form/',mviews.process_form,name='process_form'),
     path("get-user-stats/", mviews.get_user_stats, name="get_user_stats"),
-    path("chatbot-response/",mviews.chatbot_response,name='chatbot-response')
+    path("chatbot-response/",mviews.chatbot_response,name='chatbot-response'),
+    # path('assign-challenge/', mviews.assign_daily_challenge, name='assign_daily_challenge'),
+    path('dailychallenge/',mviews.dailychallenge,name='challenge'),
+    path('completechallenge/',mviews.daily_challenge_view,name='daily_challenge_view')
+
 ]
 
 authappurl = [

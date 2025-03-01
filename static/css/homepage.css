@@ -279,32 +279,73 @@ canvas {
 }
 
 /* Form Container Styles */
-.form-container {
-    background-color: #00563B; /* Dark green background */
-    padding: 20px;
+/* Super Container */
+.supercontainer {
+    display: flex;
+    flex-direction: column; /* Default: Stacked layout */
+    gap: 0; /* No gap, using a white border instead */
+    margin: 150px; /* Moves container away from screen edges */
+    background-color: #58ab90; /* Same as sub-containers */
+    padding: 20px; /* Inner spacing for content */
     border-radius: 10px;
-    max-width: 400px;
-    height: 300px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    color: #E5F6DF; /* Light green text */
-    position: relative;
-    flex-shrink: 0; /* Prevent the form container from shrinking */
 }
 
-/* Chats Container Styles */
+/* Shared Container Styles */
+.form-container, 
 .chats {
-    background-color: #fff; /* White background */
+    background-color: #58ab90; /* Same green background */
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    color: #00563B; /* Dark green text */
-    font-size: 16px;
-    flex-grow: 1; /* Allow the chats container to take the remaining space */
-    min-width: 0;
-    height: 300px; /* Fixed height */
+    border-radius: 0; /* Remove border-radius to ensure seamless connection */
+    height: 300px;
     display: flex;
     flex-direction: column;
 }
+
+/* Form-specific styles */
+.form-container {
+    max-width: 50%;
+    color: #E5F6DF; /* Light green text */
+    position: relative;
+    flex-shrink: 0;
+    border-bottom: 2px solid white; /* White separator */
+}
+
+/* Chat-specific styles */
+.chats {
+    flex-grow: 1;
+    min-width: 0;
+    font-size: 16px;
+    color: #E5F6DF; /* Light green text for consistency */
+}
+
+/* Responsive Layout */
+@media screen and (max-width: 768px) {
+    .supercontainer {
+        flex-direction: column; /* Stacked layout for smaller screens */
+        margin: 20px; /* Reduce margin for smaller screens */
+    }
+
+    .form-container {
+        border-bottom: 2px solid white; /* White separator when stacked */
+    }
+}
+
+@media screen and (min-width: 769px) {
+    .supercontainer {
+        flex-direction: row; /* Side-by-side layout for larger screens */
+        align-items: stretch;
+    }
+
+    .form-container {
+        border-right: 2px solid white; /* White vertical separator when side-by-side */
+        border-bottom: none; /* Remove bottom border for large screens */
+    }
+}
+
+
+
+
 
 /* Scrollable Chat Entries */
 .chat-entries {
@@ -315,7 +356,7 @@ canvas {
 
 /* Chat Entry Styles */
 .chat-entry {
-    background-color: #00563B; /* Dark green background */
+    background-color: #58ab90; /* Dark green background */
     color: #E5F6DF; /* Light green text */
     padding: 10px;
     border-radius: 5px;
