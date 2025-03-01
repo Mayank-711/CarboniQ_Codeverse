@@ -12,6 +12,7 @@
     <!-- jQuery (for autocomplete if needed) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
+    <link href="{% static 'css/chatbot.css' %}" rel="stylesheet">
 
     <style>
         /* Streak & Coins Box Styling (Fixed at Top Right Below Navbar) */
@@ -35,79 +36,7 @@
         }
 
         /* Chatbot Styles */
-        .chatbot-container {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 320px;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            display: none;
-            flex-direction: column;
-            z-index: 1100; /* Ensures chatbot is above all */
-        }
-        .chatbot-header {
-            background: #007bff;
-            color: white;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chatbot-header button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-        }
-        .chatbot-body {
-            height: 300px;
-            padding: 10px;
-            overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-        }
-        .chatbot-footer {
-            display: flex;
-            padding: 10px;
-            background: #f1f1f1;
-            border-top: 1px solid #ddd;
-        }
-        .chatbot-footer input {
-            flex: 1;
-            padding: 8px;
-            border: none;
-            border-radius: 5px;
-            outline: none;
-        }
-        .chatbot-footer button {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        /* Chatbot Floating Button */
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #007bff;
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            font-size: 24px;
-            z-index: 1101; /* Ensures icon is on top of everything */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
+       
     </style>
 
     {% block extra_head %}{% endblock %}
