@@ -27,3 +27,23 @@ class TripLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.source_address} to {self.destination_address} ({self.date})"
+    
+
+
+class Chat(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Link to the user
+    source_lat = models.FloatField()
+    source_lng = models.FloatField()
+    dest_lat = models.FloatField()
+    dest_lng = models.FloatField()
+    source_address = models.CharField(max_length=255)
+    destination_address = models.CharField(max_length=255)
+    search_date = models.DateField()
+    search_time = models.TimeField()
+    distance = models.FloatField()
+    duration = models.FloatField()
+    carbon_footprint = models.JSONField()  # Store carbon footprint data in JSON format
+    Nearby_Bus_Stops = models.CharField(max_length=300)
+    def __str__(self):
+        return f"Trip from {self.source_address} to {self.destination_address} on {self.search_date}"
+    
