@@ -280,21 +280,29 @@ document.addEventListener('DOMContentLoaded', function () {
     sourceResults.addEventListener('click', (event) => event.stopPropagation());
     destResults.addEventListener('click', (event) => event.stopPropagation());
 });
-
 document.addEventListener("DOMContentLoaded", function () {
     const dateInput = document.getElementById("date");
 
-    function setAllowedDates() {
-        const today = new Date();
-        const yesterday = new Date();
-        const dayBeforeYesterday = new Date();
+    function toIST(date) {
+        const offsetIST = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+        return new Date(date.getTime() + offsetIST);
+    }
 
-        yesterday.setDate(today.getDate() - 1);
-        dayBeforeYesterday.setDate(today.getDate() - 2);
+    function setAllowedDates() {
+        const nowUTC = new Date();
+        const todayIST = toIST(nowUTC);
+
+        const yesterdayIST = new Date(todayIST);
+        yesterdayIST.setDate(todayIST.getDate() - 1);
+
+        const dayBeforeYesterdayIST = new Date(todayIST);
+        dayBeforeYesterdayIST.setDate(todayIST.getDate() - 2);
 
         // Format YYYY-MM-DD
-        const maxDate = today.toISOString().split("T")[0];
-        const minDate = dayBeforeYesterday.toISOString().split("T")[0];
+        const formatDate = (date) => date.toISOString().split("T")[0];
+
+        const maxDate = formatDate(todayIST);
+        const minDate = formatDate(dayBeforeYesterdayIST);
 
         dateInput.setAttribute("min", minDate);
         dateInput.setAttribute("max", maxDate);
@@ -302,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     setAllowedDates();
 });
+
 
 </script>
 {% endblock %}

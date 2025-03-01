@@ -152,7 +152,7 @@ def logtrip(request):
         )
 
         # Streak & Coin Logic
-        today = timezone.now().date()
+        today = timezone.localtime(timezone.now()).date()
         print(f"[DEBUG] Today's Date: {today}")
 
         try:
