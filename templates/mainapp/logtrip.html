@@ -12,14 +12,21 @@
 
     <div class="container">
         {% if messages %}
-    <div class="messages-container">
-        {% for message in messages %}
-            <div class="message {{ message.tags }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    </div>
-{% endif %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    
+        <script>
+            setTimeout(function () {
+                document.querySelectorAll('.messages-container').forEach(el => el.remove());
+            }, 3000);  // Messages disappear after 3 seconds
+        </script>
+    {% endif %}
+    
 
         <div class="row">
             <!-- Log Trip Form (33%) -->
