@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,13 +32,15 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#eco-importance" data-aos="fade-left" data-aos-delay="200">Why CarbonIQ</a>
+                        <a class="nav-link" href="#eco-importance" data-aos="fade-left" data-aos-delay="200">Why
+                            CarbonIQ</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#about" data-aos="fade-left" data-aos-delay="100">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}" data-aos="fade-left" data-aos-delay="300" style="background-color: white; border-radius: 15px; color: green;width:80px;padding-left:10px">LOGIN</a>
+                        <a class="nav-link" href="{% url 'login' %}"
+                            style="background-color: white; border-radius: 15px; color: green;width:80px;padding-left:10px">Login</a>
                     </li>
                 </ul>
             </div>
@@ -73,11 +76,12 @@
 
         <div class="scroll-indicator">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
-                <path d="M7 10l5 5 5-5z"/>
+                <path d="M7 10l5 5 5-5z" />
             </svg>
         </div>
     </section>
-    <button class="fab btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom" onclick="toggleChatbot()">💬</button>
+    <button class="fab btn" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Tooltip on bottom"
+        onclick="toggleChatbot()">💬</button>
 
     <!-- Chatbot -->
     <div class="chatbot-container" id="chatbot">
@@ -86,10 +90,11 @@
             <button onclick="toggleChatbot()">✖</button>
         </div>
         <div class="chatbot-body" id="chatBody">
-            <p><strong>GreenBot:</strong> Hello! Myself GreenBot, your personal green trip advisor . How can I assist you?</p>
+            <p><strong>GreenBot:</strong> Hello! Myself GreenBot, your personal green trip advisor . How can I assist
+                you?</p>
         </div>
         <div class="chatbot-footer">
-            <input type="text" id="userInput" placeholder="I want to travel 5km...">
+            <input type="text" id="userInput" placeholder="I want to travel 5km..." onkeypress="handleEnter(event)">
             <button onclick="sendMessage()" style="padding:10px;width:50px;font-size:20px">▷</button>
         </div>
     </div>
@@ -98,7 +103,8 @@
         <div class="container">
             <div class="section-header" data-aos="fade-up">
                 <h1>Join the CarbonIQ Movement!</h1>
-                <p class="section-description">Together, we can make a difference in the world through eco-friendly travel. Join us and take action today!</p>
+                <p class="section-description">Together, we can make a difference in the world through eco-friendly
+                    travel. Join us and take action today!</p>
 
             </div>
 
@@ -109,7 +115,8 @@
                             <img src="{% static 'images/reduceco2.jpg' %}" alt="Reducing Carbon Footprint">
                         </div>
                         <h5>Reducing Carbon Footprint</h5>
-                        <p>Eco-friendly travel helps reduce your carbon footprint, conserving the environment for future generations.</p>
+                        <p>Eco-friendly travel helps reduce your carbon footprint, conserving the environment for future
+                            generations.</p>
                     </div>
                 </div>
 
@@ -119,7 +126,8 @@
                             <img src="{% static 'images/prenatre.jpeg' %}" alt="Preserving Natural Resources">
                         </div>
                         <h5>Preserving Natural Resources</h5>
-                        <p>Make sustainable choices that help preserve our natural resources for generations to come.</p>
+                        <p>Make sustainable choices that help preserve our natural resources for generations to come.
+                        </p>
                     </div>
                 </div>
 
@@ -149,10 +157,12 @@
                 <div class="col-lg-6" data-aos="fade-left">
                     <div class="about-text">
                         <h3>About Us</h3>
-                        <p>At CarbonIQ, we're passionate about making travel more sustainable. We provide innovative solutions
-                           to help you make eco-conscious travel choices while exploring the world.</p>
-                        <p>Our community of environmentally conscious travelers shares tips, experiences, and a common goal:
-                           to protect our planet while discovering its beauty.</p>
+                        <p>At CarbonIQ, we're passionate about making travel more sustainable. We provide innovative
+                            solutions
+                            to help you make eco-conscious travel choices while exploring the world.</p>
+                        <p>Our community of environmentally conscious travelers shares tips, experiences, and a common
+                            goal:
+                            to protect our planet while discovering its beauty.</p>
                         <a href="#" class="learn-more-btn">Learn More <span>&rarr;</span></a>
                     </div>
                 </div>
@@ -162,47 +172,48 @@
 
     <section id="ecoFeatures" class="eco-section">
         <div class="eco-background" style="background-image: url({% static 'images/l1.jpeg' %});">
-          <div class="container">
-            <div class="eco-content" data-aos="fade-up">
-              <h1>Our Features</h1>
-              <p>Discover how CarbonIQ helps you travel sustainably</p>
-            </div>
-
-            <div id="ecoCarousel" class="carousel slide" data-bs-ride="carousel">
-              <div class="carousel-inner">
-                <div class="carousel-item active">
-                  <div class="row justify-content-center">
-                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                      <div class="eco-card">
-                        <h5>Trip Planner</h5>
-                        <p>Plan your eco-friendly journeys with our intelligent route optimizer.</p>
-                      </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                      <div class="eco-card">
-                        <h5>Carbon Calculator</h5>
-                        <p>Track and reduce your travel carbon footprint with our advanced calculator.</p>
-                      </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                      <div class="eco-card">
-                        <h5>Green Rewards</h5>
-                        <p>Earn points for eco-friendly choices and redeem exciting rewards.</p>
-                      </div>
-                    </div>
-                  </div>
+            <div class="container">
+                <div class="eco-content" data-aos="fade-up">
+                    <h1>Our Features</h1>
+                    <p>Discover how CarbonIQ helps you travel sustainably</p>
                 </div>
-              </div>
-            </div>
 
-            <div class="eco-cta">
-              <h2>Ready to Start Your Eco-Friendly Journey?</h2>
-              <p>Join thousands of travelers making a difference.</p>
-              <a href="{% url 'login' %}" class="learn-more-btn">Get Started Today</a>
+                <div id="ecoCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                                    <div class="eco-card">
+                                        <h5>Trip Planner</h5>
+                                        <p>Plan your eco-friendly journeys with our intelligent route optimizer.</p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                                    <div class="eco-card">
+                                        <h5>Carbon Calculator</h5>
+                                        <p>Track and reduce your travel carbon footprint with our advanced calculator.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                                    <div class="eco-card">
+                                        <h5>Green Rewards</h5>
+                                        <p>Earn points for eco-friendly choices and redeem exciting rewards.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="eco-cta">
+                    <h2>Ready to Start Your Eco-Friendly Journey?</h2>
+                    <p>Join thousands of travelers making a difference.</p>
+                    <a href="{% url 'login' %}" class="learn-more-btn">Get Started Today</a>
+                </div>
             </div>
-          </div>
         </div>
-      </section>
+    </section>
 
 
     <!-- Enhanced Footer -->
@@ -223,7 +234,7 @@
         });
 
         // Navbar scroll effect
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const navbar = document.querySelector('.navbar');
             if (window.scrollY > 50) {
                 navbar.classList.add('scrolled');
@@ -236,6 +247,11 @@
         function toggleChatbot() {
             const chatbot = document.getElementById("chatbot");
             chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
+        }
+        function handleEnter(event) {
+            if (event.key == "Enter") {
+                sendMessage();
+            }
         }
 
         async function sendMessage() {
@@ -263,8 +279,9 @@
                 chatBody.scrollTop = chatBody.scrollHeight;
             }
         }
-    
+
 
     </script>
 </body>
+
 </html>

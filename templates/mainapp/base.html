@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CarbonIQ{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo1.png' %}">
 
     <!-- CSS Libraries -->
     <link href="{% static 'css/mainbase.css' %}" rel="stylesheet">
-    
+
     <!-- jQuery (for autocomplete if needed) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
@@ -36,7 +37,7 @@
         }
 
         /* Chatbot Styles */
-       
+
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -63,9 +64,9 @@
 
     <!-- Streak & Coins Box (Fixed at Top Right Below Navbar) -->
     <div class="streak-coins-box" id="userStats">
-        <img src="{% static 'images/leaf.png' %}" alt="Streak"> 
+        <img src="{% static 'images/leaf.png' %}" alt="Streak">
         <span id="streakCount">--</span> Days
-        <img src="{% static 'images/coin.png' %}" alt="Coins"> 
+        <img src="{% static 'images/coin.png' %}" alt="Coins">
         <span id="coinCount">--</span>
     </div>
 
@@ -75,7 +76,8 @@
     </main>
 
     <!-- Chatbot Floating Button -->
-    <div class="fab" onclick="toggleChatbot()">💬</div>
+    <button class="fab btn" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="GreenBot"
+        onclick="toggleChatbot()">💬</button>
 
     <!-- Chatbot -->
     <div class="chatbot-container" id="chatbot">
@@ -87,7 +89,7 @@
             <p><strong>GreenBot:</strong> Hello! Myself GreenBot, your personal green trip advisor . How can I assist you?</p>
         </div>
         <div class="chatbot-footer">
-            <input type="text" id="userInput" placeholder="Ex:- I want to travel 5km..." onkeypress="">
+            <input type="text" id="userInput" placeholder="Ex:- I want to travel 5km..." onkeypress="handleEnter(event)">
             <button onclick="sendMessage()" style="padding:10px;width:50px;font-size:20px">▷</button>
         </div>
     </div>
@@ -101,6 +103,12 @@
 
     <!-- Async JavaScript to Fetch Streak & Coins -->
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
         document.addEventListener("DOMContentLoaded", async function () {
             const streakElement = document.getElementById("streakCount");
             const coinElement = document.getElementById("coinCount");
@@ -124,13 +132,10 @@
             chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
         }
 
-        function handleEnter(e){
-            e.preventDefault();
-            if(e.key == "Enter"){
-                let text = document.getElementById("userInput").value;
-                let response = get_response(text);
-                console.log(response);
-            }
+        function handleEnter(event){
+            if(event.key == "Enter"){
+                sendMessage();
+            }
         }
 
 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CarbonIQ{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/authapp.css' %}">
+    <link rel="icon" type="image/png" href="{% static 'images/logo1.png' %}">
     <style>
         body{background-image: url('{% static "images/login.jpg" %}');}
     </style>
@@ -16,7 +17,7 @@
     </div>     {% endcomment %}
     <div class="container">
         <div class="logo">
-            <div id="logocircle"><img src="{% static 'images/logo.png' %}" alt="CarbonIQ"></div>
+            <div id="logocircle"><img src="{% static 'images/logo1.png' %}" alt="CarbonIQ"></div>
             <span>CarbonIQ</span>
         </div>
         {% block content %}
