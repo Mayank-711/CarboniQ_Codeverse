@@ -79,8 +79,16 @@ endblock %} {% block content %}
     <div class="container">
       <div class="forms-container">
         <div class="signin-signup">
+          
           <!-- Login Form -->
           <form method="post" class="sign-in-form" action="{% url 'login' %}">
+            <h1>
+              <a
+                href="{% url 'landingpage' %}"
+                style="color: inherit; text-decoration: none;margin-bottom: 50px"
+                >CarbonIQ</a
+              >
+            </h1>
             {% csrf_token %}
             <h2 class="title">LOGIN</h2>
             {% if messages %}
@@ -115,7 +123,7 @@ endblock %} {% block content %}
             <a
               href="{% url 'landingpage' %}"
               style="color: inherit; text-decoration: none"
-              >Back to Home</a
+              >Back to <span style="color:green;font-size:20px">Home</span></a
             >
           </form>
 
@@ -159,7 +167,7 @@ endblock %} {% block content %}
             <a
               href="{% url 'landingpage' %}"
               style="color: inherit; text-decoration: none"
-              >Back to Home</a
+              >Back to <span style="color:green;font-size:20px">Home</span></a
             >
           </form>
         </div>
@@ -169,13 +177,6 @@ endblock %} {% block content %}
       <div class="panels-container">
         <div class="panel left-panel">
           <div class="content">
-            <h1>
-              <a
-                href="{% url 'landingpage' %}"
-                style="color: inherit; text-decoration: none"
-                >CarbonIQ</a
-              >
-            </h1>
             <h3>New here?</h3>
             <p>Join us and start your journey today.</p>
             <button class="btn transparent" id="sign-up-btn">SIGN UP</button>
