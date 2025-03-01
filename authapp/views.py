@@ -76,7 +76,7 @@ def signuppage(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return redirect('landingpage')
 
 
 

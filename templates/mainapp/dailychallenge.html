@@ -1,0 +1,129 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+
+{% block title %}Daily Challenge{% endblock %}
+
+{% block extra_head %}
+<style>
+    .daily-challenge-box {
+        max-width: 400px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+    .daily-challenge-box h3 { color: #007bff; }
+    .challenge-status { font-weight: bold; margin-bottom: 10px; }
+    .completed { color: green; }
+    .not-completed { color: red; }
+    .btn-complete {
+        background: #28a745;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s ease;
+    }
+    .btn-complete:hover { background: #218838; }
+    .btn-complete:disabled { background: gray; cursor: not-allowed; }
+
+    .messages {
+        list-style-type: none;
+        padding: 10px;
+        max-width: 400px;
+        margin: 10px auto;
+        text-align: center;
+    }
+    .messages li {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 5px;
+    }
+    .messages .success { background: #d4edda; color: #155724; }
+    .messages .error { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Display Messages -->
+<ul class="messages">
+    {% for message in messages %}
+        <li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+    {% endfor %}
+</ul>
+
+<div id="dailyChallengeBox" class="daily-challenge-box">
+    <h3>Today's Challenge</h3>
+    <p id="challengeTitle">Loading...</p>
+    <p id="challengeDesc"></p>
+    
+    <p id="challengeStatus" class="challenge-status not-completed">Status: Not Completed ❌</p>
+    <button id="completeChallengeBtn" class="btn-complete">Mark as Completed</button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        await fetchChallenge();
+    });
+    
+    async function fetchChallenge() {
+        try {
+            const response = await fetch("{% url 'daily_challenge_view' %}", { method: "GET" });
+            if (!response.ok) throw new Error("Failed to fetch challenge");
+    
+            const data = await response.json();
+            document.getElementById("challengeTitle").textContent = data.challenge;
+            document.getElementById("challengeDesc").textContent = data.description;
+    
+            if (data.completed) {
+                updateUI(true);
+            }
+        } catch (error) {
+            console.error("Error fetching daily challenge:", error);
+        }
+    }
+    
+    document.getElementById("completeChallengeBtn").addEventListener("click", async function () {
+        try {
+            const response = await fetch("{% url 'daily_challenge_view' %}", { 
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+    
+            const data = await response.json();
+            if (data.success) {
+                updateUI(true);
+                alert(data.message);  // 🎉 Show success message
+            } else {
+                alert("⚠️ " + data.message);
+            }
+        } catch (error) {
+            console.error("Error completing challenge:", error);
+        }
+    });
+    
+    function updateUI(isCompleted) {
+        const statusText = document.getElementById("challengeStatus");
+        const completeBtn = document.getElementById("completeChallengeBtn");
+    
+        if (isCompleted) {
+            statusText.textContent = "Status: Completed ✅";
+            statusText.classList.add("completed");
+            statusText.classList.remove("not-completed");
+            completeBtn.disabled = true;
+        }
+    }
+    
+    // Auto-hide messages after 3 seconds
+    setTimeout(() => {
+        document.querySelectorAll(".messages li").forEach(el => el.style.display = "none");
+    }, 3000);
+    
+</script>
+
+{% endblock %}
