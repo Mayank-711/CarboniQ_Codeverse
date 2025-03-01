@@ -1,7 +1,3 @@
 .gitignore
 .env
-<<<<<<< HEAD
-=======
-.gitignore
->>>>>>> 8b55570ee8d34a67a848ff6c18ad59a73d315aad
 mainapp/ml/models/

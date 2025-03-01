@@ -19,6 +19,9 @@
     <!-- Enhanced Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
+            <a class="navbar-logo" href="#" data-aos="fade-right">
+                <img src="{% static 'images/logo1.png' %}" width="40px" height="40px" alt="CarbonIQ Logo">
+            </a>
             <a class="navbar-brand" href="#" data-aos="fade-right">CarbonIQ</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,13 +30,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="#eco-importance" data-aos="fade-left" data-aos-delay="200">Why CarbonIQ</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#about" data-aos="fade-left" data-aos-delay="100">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#eco-importance" data-aos="fade-left" data-aos-delay="200">Why-CarbonIQ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}" data-aos="fade-left" data-aos-delay="300">Login</a>
+                        <a class="nav-link" href="{% url 'login' %}" data-aos="fade-left" data-aos-delay="300" >Login</a>
                     </li>
                 </ul>
             </div>
@@ -44,7 +47,7 @@
     <section class="video-container video-overlay">
         <div class="overlay-text" data-aos="fade-down">
             <div class="main-heading">Your journey to a better future begins with one green step.</div>
-            <div class="welcome-text">Welcome to CarbonIQ!</div>
+            <div class="welcome-text">Welcome to <span class="title-color">CarbonIQ!</span></div>
         </div>
         <video autoplay muted loop playsinline>
             <source src="{% static 'videos/LandingPage.mp4' %}" type="video/mp4">
@@ -189,7 +192,7 @@
     <!-- Enhanced Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 CarbonIQ. All rights reserved.</p>
+            <p>&copy; 2025 CarbonIQ. All rights reserved.</p>
         </div>
     </footer>
 

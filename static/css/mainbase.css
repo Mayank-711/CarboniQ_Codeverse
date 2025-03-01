@@ -27,18 +27,19 @@ body {
 }
 
 .navbar .logo img {
-    mix-blend-mode: multiply;
-    height: 70px;
+    height: 40px;
 }
 
 .navbar h1 {
     color: #E5F6DF;
     margin-left: 10px;
+    padding-top: 20px;
 }
 
 .navbar .nav-links {
     display: flex;
     gap: 20px;
+    padding-top: 20px;
 }
 
 .navbar .nav-links ul {
