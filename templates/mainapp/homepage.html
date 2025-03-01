@@ -52,9 +52,9 @@
         </div>
     </div>
 </div>
-<div id="row">
+<div id="row" class="supercontainer">
     <div class="form-container">
-        <h2>Plan Your Trip</h2>
+        <h1>PLAN YOUR TRIP</h1>
         <form id="trip-form" action="{% url 'process_form' %}" method="post">
             {% csrf_token %}
             <label for="source">Source</label>
@@ -77,7 +77,7 @@
         </form>
     </div>
     <div class="chats">
-        <div class="chat-entries">
+        <div class="chat-entries"> 
             {% if chats %}
                 <div class="chat-entry">
                     <div class="chat-row">
