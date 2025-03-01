@@ -1,0 +1,152 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block title %}Home{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN -->
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Dashboard</h1>
+
+    <!-- Stats Section -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3>Total Trips</h3>
+            <p id="totalTrips">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Greener Trips</h3>
+            <p id="greenerTrips">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Public Transport Trips</h3>
+            <p id="publicTrips">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Total CO₂ Emission (g)</h3>
+            <p id="totalEmission">0</p>
+        </div>
+    </div>
+
+    <!-- Graphs -->
+    <div class="dashboard">
+        <!-- Double Pie Chart (Distance & CO₂ Emission) -->
+        <div class="graph-container">
+            <h2 class="graph-title">Vehicle Distance vs CO₂ Emission</h2>
+            <canvas id="doublePieChart"></canvas>
+        </div>
+
+        <!-- Line Graph for Weekly CO₂ Emissions -->
+        <div class="graph-container">
+            <h2 class="graph-title">Daily CO₂ Emission This Week</h2>
+            <canvas id="weeklyLineGraph"></canvas>
+        </div>
+
+        <!-- Line Graph for Monthly CO₂ Emissions -->
+        <div class="graph-container">
+            <h2 class="graph-title">Daily CO₂ Emission This Month</h2>
+            <canvas id="monthlyLineGraph"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Data from Django Backend
+        const graphData = JSON.parse('{{ graph_data|safe }}');
+
+        // Update Stats
+        document.getElementById('totalTrips').innerText = graphData.total_trips;
+        document.getElementById('greenerTrips').innerText = graphData.greener_trips;
+        document.getElementById('publicTrips').innerText = graphData.public_trips;
+        document.getElementById('totalEmission').innerText = graphData.total_co2_emission.toFixed(2);
+
+        // Colors for charts
+        const colors = ['#28a745', '#ff5733', '#ffc107', '#007bff', '#6f42c1', '#17a2b8'];
+
+        // Double Pie Chart (Distance vs CO₂ Emission)
+        const ctxDoublePie = document.getElementById('doublePieChart').getContext('2d');
+        new Chart(ctxDoublePie, {
+            type: 'doughnut',
+            data: {
+                labels: graphData.pie_labels,
+                datasets: [
+                    {
+                        label: 'Distance (km)',
+                        data: graphData.distance_values,
+                        backgroundColor: colors,
+                        borderWidth: 1,
+                        hoverOffset: 5
+                    },
+                    {
+                        label: 'CO₂ Emission (g)',
+                        data: graphData.emission_values,
+                        backgroundColor: colors.map(color => color + 'BB'), // Lighter for outer ring
+                        borderWidth: 1,
+                        hoverOffset: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                cutoutPercentage: 50, // Makes it look like a double pie
+                plugins: {
+                    legend: { position: 'top' }
+                }
+            }
+        });
+
+        // Weekly Line Graph (Daily CO₂ Emissions)
+        const ctxWeeklyLine = document.getElementById('weeklyLineGraph').getContext('2d');
+        new Chart(ctxWeeklyLine, {
+            type: 'line',
+            data: {
+                labels: graphData.daily_labels,
+                datasets: [{
+                    label: 'CO₂ Emission (g) - Weekly',
+                    data: graphData.daily_values,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+        // Monthly Line Graph (Daily CO₂ Emissions)
+        const ctxMonthlyLine = document.getElementById('monthlyLineGraph').getContext('2d');
+        new Chart(ctxMonthlyLine, {
+            type: 'line',
+            data: {
+                labels: graphData.monthly_labels,
+                datasets: [{
+                    label: 'CO₂ Emission (g) - Monthly',
+                    data: graphData.monthly_values,
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+
+    });
+</script>
+{% endblock %}

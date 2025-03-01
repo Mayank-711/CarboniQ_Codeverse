@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from CarboniQ_Codeverse import settings
 from mainapp import views as mviews
 from authapp import views as aviews
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,7 +27,9 @@ urlpatterns = [
 
 
 mainappurl = [
-path('homepage/', mviews.homepage, name='homepage'),
+     path('homepage/', mviews.homepage, name='homepage'),
+    path('logtrip/', mviews.logtrip, name='logtrip'),
+    path('leaderboards/', mviews.leaderboards, name='leaderboards'),
 ]
 
 authappurl = [
@@ -48,3 +52,7 @@ authappurl = [
 
 
 urlpatterns = mainappurl + authappurl + urlpatterns
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

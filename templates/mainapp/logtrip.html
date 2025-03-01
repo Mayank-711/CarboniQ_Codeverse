@@ -1,0 +1,300 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block title %}Logtrip{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/logtrip.css' %}">
+    <style>
+
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="container">
+        {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+        <div class="row">
+            <!-- Log Trip Form (33%) -->
+            <div class="col-md-4">
+                <div class="form-container">
+                    <h2>Log Your Trip</h2>
+                    <form id="trip-form" action="{% url "logtrip" %}" method="post">
+                        {% csrf_token %}
+                        <div class="autocomplete-container">
+                            <label for="source">Source</label>
+                            <input type="text" id="source-input" name="source" placeholder="Enter source location" required />
+                            <ul id="source-results" class="autocomplete-results"></ul>
+                        </div>                        
+                        <input type="hidden" id="source-lat" name="source_lat">
+                        <input type="hidden" id="source-lng" name="source_lng">
+
+                        <div class="autocomplete-container">
+                            <label for="destination">Destination</label>
+                            <input type="text" id="destination-input" name="destination" placeholder="Enter destination location" required />
+                            <ul id="destination-results" class="autocomplete-results"></ul>
+                        </div>
+                        <input type="hidden" id="dest-lat" name="dest_lat">
+                        <input type="hidden" id="dest-lng" name="dest_lng">
+
+                        <div class="flex-container">
+                            <div>
+                                <label for="mode-of-transport">Mode of Transport</label>
+                                <select id="mode-of-transport" name="mode_of_transport" required>
+                                    <option value="bus">Bus</option>
+                                    <option value="train">Local Train</option>
+                                    <option value="actrain">Metro</option>
+                                    <option value="car">Car</option>
+                                    <option value="bike">Bike</option>
+                                    <option value="walk">Walk</option>
+                                    <option value="bicycle">Bicycle</option>
+                                    <option value="rickshaw">Rickshaw</option>
+                                    <option value="scooter">Scooter</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="electric-vehicle">Electric Vehicle?</label>
+                                <select id="electric-vehicle" name="electric_vehicle">
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                </select>
+                            </div>
+                            <div class="passenger-input">
+                                <label for="passenger-taken">Passengers (Not for Public Transport)</label>
+                                <input type="number" id="passengers" name="passengers" step="1"/>
+                            </div>
+                        </div>
+
+                        <div class="flex-container-date">
+                            <div class="date-input">
+                                <label for="date">Date</label>
+                                <input type="date" id="date" name="date" required />
+                            </div>
+                            <div class="time-input">
+                                <label for="time-taken">Time Taken (minutes)</label>
+                                <input type="number" id="time-taken" name="time_taken" step="1" required />
+                            </div>
+                        </div>
+
+                        <!-- Hidden fields to capture API values -->
+                        <input type="hidden" id="calculated-distance" name="calculated_distance">
+                        <input type="hidden" id="calculated-duration" name="calculated_duration">
+
+                        <button type="submit">Submit Trip</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recent Trips Section (66%) -->
+            <div class="col-md-8">
+                <div class="trip-container">
+                    <h3>Recent Trips</h3>
+            
+                    <div class="trip-log-wrapper">
+                        <div class="trip-log-container">
+                            {% if trip_logs %}
+                                {% for trip in trip_logs %}
+                                    <div class="trip-summary {% if trip.greener_travel %}green-trip{% else %}red-trip{% endif %}">
+                                        <div class="trip-row">
+                                            <span><strong>From:</strong> {{ trip.source_address }}</span>
+                                            <span><strong>To:</strong> {{ trip.destination_address }}</span>
+                                            <span><strong>Date:</strong> {{ trip.date }}</span>
+                                        </div>
+                                        <div class="trip-row">
+                                            <span><strong>Mode:</strong> {{ trip.mode_of_transport }}</span>
+                                            <span><strong>Time:</strong> {{ trip.time_taken }} mins</span>
+                                            <span><strong>Distance:</strong> {{ trip.api_distance }} km</span>
+                                            <span><strong>CO₂ Emission:</strong> {{ trip.co2_emission }}g</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="no-trips">No trips logged yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+            
+                    <!-- Pagination Buttons -->
+                    <div class="pagination bottom-pagination">
+                        {% if trip_logs.has_previous %}
+                            <button class="pagination-btn first-btn" onclick="location.href='?page=1'">First</button>
+                            <button class="pagination-btn prev-btn" onclick="location.href='?page={{ trip_logs.previous_page_number }}'">Previous</button>
+                        {% endif %}
+            
+                        <span class="page-info">Page {{ trip_logs.number }} of {{ trip_logs.paginator.num_pages }}</span>
+            
+                        {% if trip_logs.has_next %}
+                            <button class="pagination-btn next-btn" onclick="location.href='?page={{ trip_logs.next_page_number }}'">Next</button>
+                            <button class="pagination-btn last-btn" onclick="location.href='?page={{ trip_logs.paginator.num_pages }}'">Last</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            
+        </div>
+    </div>
+{% endblock %}
+
+
+
+{% block extra_scripts %}
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    const OLAMAPS_API = "upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y";
+    const sourceInput = document.getElementById('source-input');
+    const destInput = document.getElementById('destination-input');
+    const sourceResults = document.getElementById('source-results');
+    const destResults = document.getElementById('destination-results');
+
+    const fetchSuggestions = async (input, resultsList, setCoords) => {
+        const query = input.value.trim();
+        if (query.length > 2) {
+            try {
+                const response = await fetch(`https://api.olamaps.io/places/v1/autocomplete?input=${encodeURIComponent(query)}&api_key=${OLAMAPS_API}`);
+                const data = await response.json();
+                const predictions = data.predictions || [];
+                resultsList.innerHTML = '';
+                resultsList.style.display = predictions.length ? 'block' : 'none';
+
+                predictions.forEach(prediction => {
+                    if (prediction.description && prediction.geometry) {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = prediction.description;
+                        listItem.addEventListener('click', () => {
+                            input.value = prediction.description;
+                            setCoords(prediction.geometry.location.lat, prediction.geometry.location.lng);
+                            resultsList.innerHTML = '';
+                            resultsList.style.display = 'none';
+                        });
+                        resultsList.appendChild(listItem);
+                    }
+                });
+            } catch (error) {
+                alert('Error fetching predictions. Please check your connection.');
+            }
+        }
+    };
+
+    sourceInput.addEventListener('input', () => fetchSuggestions(sourceInput, sourceResults, (lat, lng) => {
+        document.getElementById('source-lat').value = lat;
+        document.getElementById('source-lng').value = lng;
+    }));
+
+    destInput.addEventListener('input', () => fetchSuggestions(destInput, destResults, (lat, lng) => {
+        document.getElementById('dest-lat').value = lat;
+        document.getElementById('dest-lng').value = lng;
+    }));
+
+    document.getElementById('trip-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const sourceLat = document.getElementById('source-lat').value;
+        const sourceLng = document.getElementById('source-lng').value;
+        const destLat = document.getElementById('dest-lat').value;
+        const destLng = document.getElementById('dest-lng').value;
+
+        if (!sourceLat || !sourceLng || !destLat || !destLng) {
+            alert('Please select valid source and destination coordinates.');
+            return;
+        }
+
+        try {
+            const apiUrl = `https://api.olamaps.io/routing/v1/directions?origin=${sourceLat},${sourceLng}&destination=${destLat},${destLng}&mode=driving&alternatives=false&steps=true&overview=full&language=en&traffic_metadata=true&api_key=${OLAMAPS_API}`;
+
+            const routeResponse = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: ''
+            });
+
+            if (!routeResponse.ok) {
+                const errorText = await routeResponse.text();
+                alert(`Routing API error: ${errorText}`);
+                return;
+            }
+
+            const routeData = await routeResponse.json();
+
+            if (routeData.routes && routeData.routes.length > 0) {
+                const legs = routeData.routes[0].legs;
+                    const totalDistance = legs.reduce((sum, leg) => sum + leg.distance, 0) / 1000;
+                    const totalDuration = legs.reduce((sum, leg) => sum + leg.duration, 0) / 60;
+
+                    // Set calculated values before form submission
+                    document.getElementById('calculated-distance').value = totalDistance.toFixed(2);
+                    document.getElementById('calculated-duration').value = totalDuration.toFixed(2);
+
+                    document.getElementById('trip-form').submit(); // Trigger the form submission
+            } else {
+                alert('Unable to calculate route. Please try again.');
+            }
+        } catch (error) {
+            alert('Error fetching route details. Please try again.');
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const sourceInput = document.getElementById('source-input');
+    const destInput = document.getElementById('destination-input');
+    const sourceResults = document.getElementById('source-results');
+    const destResults = document.getElementById('destination-results');
+
+    const closeAutocomplete = (event) => {
+        if (
+            !sourceInput.contains(event.target) && 
+            !sourceResults.contains(event.target)
+        ) {
+            sourceResults.style.display = 'none';
+        }
+
+        if (
+            !destInput.contains(event.target) && 
+            !destResults.contains(event.target)
+        ) {
+            destResults.style.display = 'none';
+        }
+    };
+
+    document.addEventListener('click', closeAutocomplete);
+
+    // Prevent click inside the list from closing it immediately
+    sourceResults.addEventListener('click', (event) => event.stopPropagation());
+    destResults.addEventListener('click', (event) => event.stopPropagation());
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dateInput = document.getElementById("date");
+
+    function setAllowedDates() {
+        const today = new Date();
+        const yesterday = new Date();
+        const dayBeforeYesterday = new Date();
+
+        yesterday.setDate(today.getDate() - 1);
+        dayBeforeYesterday.setDate(today.getDate() - 2);
+
+        // Format YYYY-MM-DD
+        const maxDate = today.toISOString().split("T")[0];
+        const minDate = dayBeforeYesterday.toISOString().split("T")[0];
+
+        dateInput.setAttribute("min", minDate);
+        dateInput.setAttribute("max", maxDate);
+    }
+
+    setAllowedDates();
+});
+
+</script>
+{% endblock %}
