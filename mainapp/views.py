@@ -488,7 +488,7 @@ def get_user_stats(request):
     
 
 
-genai.configure(api_key="AIzaSyDmY0XB6vZIzHFhs5ijTJKfP-7PeuNg85s")
+genai.configure(api_key="AIzaSyCZdYc3yTjT0HWSyoQcele55PFY6Hs41QY")
 
 @csrf_exempt  # Disable CSRF for simplicity (Better to use tokens in production)
 def chatbot_response(request):
