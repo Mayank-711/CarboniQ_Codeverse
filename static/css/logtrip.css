@@ -2,7 +2,7 @@
 .container {
     max-width: 100%;
     margin: auto;
-    background-color: #ffffff;
+    background-color: var(--green-light);
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(0, 86, 59, 0.08);
     border: 1px solid #c8e6d7;
@@ -33,6 +33,7 @@
     max-width: 66%;
     box-sizing: border-box;
     order: 2; /* Explicitly set order to ensure it's second */
+    border-radius: 16px;
 }
 
 /* Update the responsive behavior to maintain left/right positions when possible */
@@ -138,6 +139,11 @@ button:hover {
 button:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(0, 86, 59, 0.1);
+}
+
+.trip-container-bada{
+    box-shadow: 0px 4px 12px rgba(0, 86, 59, 0.1);
+    background-color: white;
 }
 
 /* Trip Log Section */

@@ -1,5 +1,5 @@
 :root {
-    --green-primary: #73ff45;
+    --green-primary: #00563B;
     --green-light: #E5F6DF;
     --green-accent: #27AE60;
     --text-color: #E5F6DF;
@@ -21,7 +21,7 @@ body {
 
 /* Enhanced Navbar */
 .navbar {
-    /* background: linear-gradient(to bottom, #6deb43 0%, transparent 100%); */
+    background: linear-gradient(to bottom, #7fcd65 0%, transparent 100%);
     padding: 20px 0;
     transition: all 0.3s ease;
 }
@@ -36,8 +36,12 @@ body {
     color: var(--text-color);
     font-size: 2.5rem;
     font-weight: 700;
-    margin-left: 40px;
+    margin-left: 4px;
     letter-spacing: -1px;
+}
+
+.navbar-logo{
+    margin-left: 40px;
 }
 
 .navbar-brand:hover {
@@ -83,6 +87,7 @@ body {
 }
 
 .video-container video {
+    opacity: 1;
     position: absolute;
     top: 0;
     left: 0;
@@ -90,16 +95,6 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-}
-
-.video-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.5); /* White transparent overlay */
-    z-index: 1;
 }
 
 /* Main Content Wrapper */
@@ -114,13 +109,18 @@ body {
 }
 
 .main-heading {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    font-style: italic;
+}
+
+.title-color {
+    color: rgb(246, 246, 111);
 }
 
 .welcome-text {
-    font-size: 5rem;
+    font-size: 6rem;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
@@ -506,7 +506,7 @@ color: var(--green-primary);
 
 /* Footer */
 .footer {
-    background-color: var(--green-primary);
+    background-color: black;
     color: white;
     text-align: center;
     padding: 30px 0;

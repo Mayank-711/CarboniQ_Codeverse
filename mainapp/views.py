@@ -4,13 +4,16 @@ from django.http import JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from authapp.models import Friendship, UserProfile
-from mainapp.models import TripLog
+from mainapp.models import TripLog,Chat
 from .ml.scripts.predict_co2 import predict_co2_emission
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.utils.timezone import now
 from django.db.models import Sum,F
 from datetime import date, datetime,timedelta
+import requests
+from django.views.decorators.csrf import csrf_exempt
+
 
 @login_required(login_url='/login/')
 def homepage(request):
@@ -77,8 +80,8 @@ def homepage(request):
         'public_trips': public_trips,
         'total_co2_emission': total_co2_emission
     }
-
-    return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data)})
+    last_chat = Chat.objects.filter(user=user).order_by('-search_date', '-search_time').first()
+    return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data),'chats':last_chat})
 
 
 
@@ -203,6 +206,248 @@ def get_predictions(mode_of_transport, passengers, distance, time,time_taken):
     return co2_count
 
 
+def get_weekly_leaderboard():
+    today = datetime.now().date()
+    now = datetime.now()
+
+    # Adjust week start and end dates for a week starting on Sunday and ending on Saturday
+    start_of_week = today - timedelta(days=today.weekday() + 1) if today.weekday() != 6 else today
+    end_of_week = start_of_week + timedelta(days=6)
+
+    # Filter logs from the start of the current week (Sunday) to the end of the week (Saturday)
+    weekly_logs = TripLog.objects.filter(date__gte=start_of_week, date__lte=end_of_week)
+    # Aggregate total distance and carbon footprint by user
+    leaderboard = weekly_logs.values('user__id', 'user__username').annotate(
+        total_distance=Sum('api_distance'),
+        total_carbon=Sum('co2_emission')
+    ).annotate(
+        efficiency=F('total_carbon') / F('total_distance')
+    ).order_by('efficiency')  # Order by efficiency (ascending for better efficiency)
+
+    # Get all user profiles with avatars
+    profiles = UserProfile.objects.values('user__id', 'avatar')
+
+    # Create a dictionary for quick lookup of avatars by user id
+    avatar_dict = {profile['user__id']: profile['avatar'] for profile in profiles}
+
+    # Add avatar information and round efficiency to the leaderboard entries
+    for entry in leaderboard:
+        user_id = entry['user__id']
+        entry['avatar'] = avatar_dict.get(user_id, 'default.jpg')  # Use default if no avatar found
+        # Round efficiency to 2 decimal places
+        entry['total_distance']= round(entry['total_distance'],2)
+        entry['total_carbon']= round(entry['total_carbon'],2)
+        entry['efficiency'] = round(entry['efficiency'], 2)
+
+    return {
+        'leaderboard': leaderboard,
+        'current_datetime': now,
+        'start_of_week': start_of_week,
+        'end_of_week': end_of_week,
+    }
+
+def friend_leaderboards(user):
+    today = datetime.now().date()
+
+    # Adjust week start and end dates for a week starting on Sunday and ending on Saturday
+    start_of_week = today - timedelta(days=today.weekday() + 1) if today.weekday() != 6 else today
+    end_of_week = start_of_week + timedelta(days=6)
+
+    # Get friends' IDs
+    friends_from_user = Friendship.objects.filter(from_user=user, accepted=True).values_list('to_user', flat=True)
+    friends_to_user = Friendship.objects.filter(to_user=user, accepted=True).values_list('from_user', flat=True)
+    
+    # Combine both lists to get all friends and include the user themselves
+    friends_ids = set(friends_from_user) | set(friends_to_user)
+    friends_ids.add(user.id)  # Include the logged-in user
+
+    # Filter logs for friends and the logged-in user
+    weekly_logs = TripLog.objects.filter(user__id__in=friends_ids, date__gte=start_of_week, date__lte=end_of_week)
+
+    # Aggregate total distance and carbon footprint by friend
+    friend_leaderboard = weekly_logs.values('user__id', 'user__username').annotate(
+        total_distance=Sum('api_distance'),
+        total_carbon=Sum('co2_emission')
+    ).annotate(
+        efficiency=F('total_carbon') / F('total_distance')
+    ).order_by('efficiency')  # Order by efficiency (ascending for better efficiency)
+
+    # Get friend profiles with avatars
+    profiles = UserProfile.objects.filter(user__id__in=friends_ids).values('user__id', 'avatar')
+
+    # Create a dictionary for quick lookup of avatars by user id
+    avatar_dict = {profile['user__id']: profile['avatar'] for profile in profiles}
+
+    # Add avatar information and round efficiency to the friend leaderboard entries
+    for entry in friend_leaderboard:
+        user_id = entry['user__id']
+        entry['avatar'] = avatar_dict.get(user_id, 'default.jpg')  # Use default if no avatar found
+        # Round efficiency to 2 decimal places
+        entry['total_distance']= round(entry['total_distance'],2)
+        entry['total_carbon']= round(entry['total_carbon'],2)
+        entry['efficiency'] = round(entry['efficiency'], 2)
+
+    return friend_leaderboard
+
 @login_required(login_url='/login/')
 def leaderboards(request):
-    return render(request,'mainapp/leaderboards.html')
+    now = datetime.now()
+    user = request.user
+
+    # Get the weekly leaderboard data
+    leaderboard_data = get_weekly_leaderboard()
+
+    # Get friend leaderboards data
+    friends_lboard_data = friend_leaderboards(user)
+
+    context = {
+        'leaderboard': leaderboard_data['leaderboard'],
+        'current_datetime': leaderboard_data['current_datetime'],
+        'start_of_week': leaderboard_data['start_of_week'],
+        'end_of_week': leaderboard_data['end_of_week'],
+        'friends_leaderboard': friends_lboard_data  # Add friends leaderboard to context
+    }
+    return render(request, 'mainapp/leaderboards.html', context)
+
+
+
+@csrf_exempt
+@login_required(login_url='/login/')
+def process_form(request):
+    if request.method == 'POST':
+        user = request.user
+        search_date = date.today()
+        search_time = datetime.now().strftime('%H:%M:%S')
+
+        source_lat = request.POST.get('source_lat')
+        source_lng = request.POST.get('source_lng')
+        dest_lat = request.POST.get('dest_lat')
+        dest_lng = request.POST.get('dest_lng')
+        source_add = request.POST.get('source-add')
+        dest_add = request.POST.get('destination-add')
+
+        print(f"[DEBUG] User: {user}, Date: {search_date}, Time: {search_time}")
+        print(f"[DEBUG] Source: ({source_lat}, {source_lng}), Destination: ({dest_lat}, {dest_lng})")
+        print(f"[DEBUG] Source Address: {source_add}, Destination Address: {dest_add}")
+
+        if source_lat and source_lng and dest_lat and dest_lng:
+            try:
+                # Prepare parameters for the OLA Maps API request
+                params = {
+                    'origin': f'{source_lat},{source_lng}',
+                    'destination': f'{dest_lat},{dest_lng}',
+                    'mode': 'driving',
+                    'alternatives': 'false',
+                    'steps': 'true',
+                    'overview': 'full',
+                    'language': 'en',
+                    'traffic_metadata': 'true',
+                    'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
+                }
+
+                print(f"[DEBUG] OLA Maps API Request Params: {params}")
+
+                # Make the API request
+                response = requests.post('https://api.olamaps.io/routing/v1/directions', params=params)
+                print(f"[DEBUG] OLA Maps API Response Code: {response.status_code}")
+
+                if response.status_code == 200:
+                    data = response.json()
+                    print(f"[DEBUG] OLA Maps API Response Data: {json.dumps(data, indent=2)}")
+
+                    if 'routes' in data and data['routes']:
+                        legs = data['routes'][0]['legs']
+                        total_distance = sum(leg['distance'] for leg in legs) / 1000  # Convert to km
+                        total_duration = sum(leg['duration'] for leg in legs) / 60  # Convert to minutes
+                        total_distance = round(total_distance, 2)
+                        total_duration = round(total_duration, 2)
+
+                        print(f"[DEBUG] Total Distance: {total_distance} km, Total Duration: {total_duration} mins")
+
+                        # Transport types and their CO2 emissions
+                        list_of_transport = {
+                            "Bus": 50, "Electric Bus": 10, "AC Bus": 80, "Electric AC Bus": 10,
+                            "Train": 41, "Electric Train": 10, "AC Train": 50, "Electric AC Train": 10,
+                            "Car 1 Passenger": 128, "Electric Car 1 Passenger": 20,
+                            "Car 2 Passenger": 64, "Electric Car 2 Passenger": 20,
+                            "Car 3 Passenger": 48, "Electric Car 3 Passenger": 20,
+                            "Car 4 Passenger": 32, "Electric Car 4 Passenger": 20,
+                            "Bike 1 Passenger": 50, "Electric Bike 1 Passenger": 20,
+                            "Bike 2 Passenger": 40, "Electric Bike 2 Passenger": 20,
+                            "Rickshaw 1 Passenger": 100, "Electric Rickshaw 1 Passenger": 10,
+                            "Rickshaw 2 Passenger": 80, "Electric Rickshaw 2 Passenger": 10,
+                            "Rickshaw 3 Passenger": 70, "Electric Rickshaw 3 Passenger": 10,
+                            "Scooter 1 Passenger": 50, "Electric Scooter 1 Passenger": 20,
+                            "Scooter 2 Passenger": 40, "Electric Scooter 2 Passenger": 20,
+                            "Walk": 0, "Bicycle": 0
+                        }
+
+                        carbon_footprint_perkm = {mode: round(value * total_distance, 2) for mode, value in list_of_transport.items()}
+                        print(f"[DEBUG] Carbon Footprint per KM: {carbon_footprint_perkm}")
+
+                        # Nearby places search
+                        # ✅ Corrected Nearby Search API Request
+                        url = 'https://api.olamaps.io/places/v1/nearbysearch/advanced'
+                        nearby_params = {
+                            'location': f'{source_lat},{source_lng}',
+                            'radius': 1000,  # Increased to 1000m for better results
+                            'types': 'bus_station,train_station,subway_station',  # ✅ Fixed types
+                            'withCentroid': 'false',
+                            'rankBy': 'distance',
+                            'limit': 5,
+                            'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
+                        }
+                        print(f"[DEBUG] Nearby Search API Request Params: {nearby_params}")
+
+                        headers = {'accept': 'application/json'}
+                        nearby_response = requests.get(url, headers=headers, params=nearby_params)
+                        print(f"[DEBUG] Nearby Places API Response Code: {nearby_response.status_code}")
+
+                        nearby_bus_stops = []
+                        if nearby_response.status_code == 200:
+                            nearby_data = nearby_response.json()
+                            print(f"[DEBUG] Nearby Places API Response Data: {json.dumps(nearby_data, indent=2)}")
+
+                            if 'predictions' in nearby_data:
+                                for place in nearby_data['predictions']:
+                                    nearby_bus_stops.append(place.get('structured_formatting', {}).get('main_text', 'Unknown Place'))
+                            else:
+                                print("[DEBUG] No nearby places found.")
+
+                        nearby_bus_stops_str = ', '.join(nearby_bus_stops)
+                        print(f"[DEBUG] Nearby Bus Stops: {nearby_bus_stops_str}")
+
+                        # ✅ Saving Data to Database
+                        chat_entry = Chat.objects.create(
+                            user=user,
+                            source_lat=source_lat,
+                            source_lng=source_lng,
+                            dest_lat=dest_lat,
+                            dest_lng=dest_lng,
+                            source_address=source_add,
+                            destination_address=dest_add,
+                            search_date=search_date,
+                            search_time=search_time,
+                            distance=total_distance,
+                            duration=total_duration,
+                            carbon_footprint=carbon_footprint_perkm,
+                            Nearby_Bus_Stops=nearby_bus_stops_str
+                        )
+
+                        print(f"[DEBUG] Chat entry saved successfully: {chat_entry}")
+                        return redirect('homepage')
+
+                    else:
+                        print("[ERROR] No valid routes found in API response.")
+                        return redirect('homepage')
+
+                else:
+                    print(f"[ERROR] OLA Maps API Request Failed: {response.status_code}")
+                    return redirect('homepage')
+
+            except Exception as e:
+                print(f"[ERROR] Exception occurred: {e}")
+                return redirect('homepage')
+
+    print("[ERROR] Invalid request method.")
+    return redirect('homepage')

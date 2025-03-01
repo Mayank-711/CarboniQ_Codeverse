@@ -1,7 +1,7 @@
  /* leaderboards.css */
  .leaderboard-container {
     max-width: 65%;
-    margin: 20px auto;
+    margin: 10px auto;
     background-color: #f4f4f4;
     padding: 20px;
     border-radius: 10px;
@@ -13,7 +13,15 @@
 .leaderboard-container h2 {
     text-align: center;
     color: #2c6e49;
-    font-size: 2.5rem;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    margin-top: 20px;
+}
+
+.leaderboard-container h3 {
+    text-align: center;
+    color: #333;
+    font-size: 1rem;
     margin-bottom: 20px;
 }
 
