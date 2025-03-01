@@ -227,6 +227,7 @@ input[data-autocompleted] {
 .image {
   width: 70%;
   transition: 0.9s 0.6s ease-in-out;
+  margin-left: 85px;
 }
 
 .right-panel .content,
