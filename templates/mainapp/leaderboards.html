@@ -14,7 +14,8 @@
 
     <div id="globalLeaderboard" class="leaderboard-section active">
         <div class="leaderboard-container">
-            <h2>Weekly Leaderboard - From {{ start_of_week|date:"F j, Y" }} to {{ end_of_week|date:"F j, Y" }}</h2>
+            <h2>Weekly Leaderboard </h2>
+            <h3> From {{ start_of_week|date:"F j, Y" }} to {{ end_of_week|date:"F j, Y" }}</h3>
             {% if leaderboard %}
                 <ul class="leaderboard-list">
                     {% for entry in leaderboard %}
@@ -58,7 +59,8 @@
 
     <div id="friendsLeaderboard" class="leaderboard-section">
         <div class="leaderboard-container">
-            <h2>Friend's Leaderboard - From {{ start_of_week|date:"F j, Y" }} to {{ end_of_week|date:"F j, Y" }}</h2>
+            <h2>Friends Leaderboard </h2>
+            <h3> From {{ start_of_week|date:"F j, Y" }} to {{ end_of_week|date:"F j, Y" }}</h3>
             {% if friends_leaderboard %}
                 <ul class="leaderboard-list">
                     {% for entry in friends_leaderboard %}

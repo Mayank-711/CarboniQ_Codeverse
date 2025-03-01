@@ -8,6 +8,22 @@
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
+.wrapper{
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    color:  #00412A;
+    width: 100%;
+    /* margin-top: 100px; */
+}
+
+.heading-text{
+    font-size: 3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 .search-container {
     display: flex;
     justify-content: flex-end;
