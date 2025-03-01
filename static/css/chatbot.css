@@ -3,20 +3,21 @@
     bottom: 80px;
     right: 20px;
     width: 320px;
-    background: white;
+    background: rgb(255, 255, 255);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    border-radius: 20px 20px 20px 20px;
     display: none;
     flex-direction: column;
     z-index: 1100; /* Ensures chatbot is above all */
 }
 .chatbot-header {
-    background: #007bff;
+    background: #5bb779;
     color: white;
     padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 20px 20px 0 0;
 }
 .chatbot-header button {
     background: none;
@@ -29,28 +30,33 @@
     height: 300px;
     padding: 10px;
     overflow-y: auto;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ffffff;
+    border-radius:10px;
 }
 .chatbot-footer {
     display: flex;
     padding: 10px;
     background: #f1f1f1;
     border-top: 1px solid #ddd;
+    border-radius: 0 0 10px 10px ;
 }
 .chatbot-footer input {
     flex: 1;
-    padding: 8px;
+    padding:8px;
     border: none;
-    border-radius: 5px;
+    border-radius: 10px;
     outline: none;
+    font-size: 15px;
 }
 .chatbot-footer button {
-    background: #007bff;
+    background: #44cc4b;
     color: white;
     border: none;
     padding: 8px 10px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 10px;
+    margin-left: 5px;
+    font-size: 12px;
 }
 
 /* Chatbot Floating Button */
@@ -58,7 +64,7 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: #007bff;
+    background: #44cc4b;
     color: white;
     width: 50px;
     height: 50px;
@@ -70,4 +76,10 @@
     font-size: 24px;
     z-index: 1101; /* Ensures icon is on top of everything */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.fab:hover {
+    background: #0a5e45;
+    transform: translate(0, -5px);
+    transition: 0.3s;
 }

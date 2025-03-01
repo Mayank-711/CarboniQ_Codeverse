@@ -54,6 +54,7 @@
                 <li><a href="{% url 'homepage' %}"><h3>Home</h3></a></li>
                 <li><a href="{% url 'logtrip' %}"><h3>TripLog</h3></a></li>
                 <li><a href="{% url 'leaderboards' %}"><h3>Leaderboard</h3></a></li>
+                <li><a href="{% url 'challenge' %}"><h3>Challenges</h3></a></li>
                 <li><a href="{% url 'view_profile' user_id=user.id %}"><h3>Profile</h3></a></li>
                 <li><a href="{% url 'logout' %}"><h3>Logout</h3></a></li>
             </ul>
@@ -79,15 +80,15 @@
     <!-- Chatbot -->
     <div class="chatbot-container" id="chatbot">
         <div class="chatbot-header">
-            <span>Chatbot</span>
+            <span>Greenbot</span>
             <button onclick="toggleChatbot()">✖</button>
         </div>
         <div class="chatbot-body" id="chatBody">
-            <p><strong>Bot:</strong> Hello! How can I assist you?</p>
+            <p><strong>GreenBot:</strong> Hello! Myself GreenBot, your personal green trip advisor . How can I assist you?</p>
         </div>
         <div class="chatbot-footer">
-            <input type="text" id="userInput" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
+            <input type="text" id="userInput" placeholder="Ex:- I want to travel 5km..." onkeypress="">
+            <button onclick="sendMessage()" style="padding:10px;width:50px;font-size:20px">▷</button>
         </div>
     </div>
 
@@ -123,6 +124,17 @@
             chatbot.style.display = chatbot.style.display === "flex" ? "none" : "flex";
         }
 
+        function handleEnter(e){
+            e.preventDefault();
+            if(e.key == "Enter"){
+                let text = document.getElementById("userInput").value;
+                let response = get_response(text);
+                console.log(response);
+            }
+        }
+
+
+
         async function sendMessage() {
             const inputField = document.getElementById("userInput");
             const chatBody = document.getElementById("chatBody");
@@ -140,9 +152,9 @@
                     });
 
                     const data = await response.json();
-                    chatBody.innerHTML += `<p><strong>Bot:</strong> ${data.response || "No response"} 😊</p>`;
+                    chatBody.innerHTML += `<p><strong>GreenBot:</strong> ${data.response || "No response"} 😊</p>`;
                 } catch (error) {
-                    chatBody.innerHTML += `<p><strong>Bot:</strong> Error fetching response ❌</p>`;
+                    chatBody.innerHTML += `<p><strong>GreenBot:</strong> Error fetching response ❌</p>`;
                 }
 
                 chatBody.scrollTop = chatBody.scrollHeight;
