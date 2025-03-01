@@ -305,3 +305,4 @@ def leaderboards(request):
         'friends_leaderboard': friends_lboard_data  # Add friends leaderboard to context
     }
     return render(request, 'mainapp/leaderboards.html', context)
+

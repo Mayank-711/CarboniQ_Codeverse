@@ -1,0 +1,184 @@
+/* Variables */
+:root {
+    --button-color: #00563B;
+    --button-hover: #003d28;
+    --green-light: #e7f7ef;
+    --green-medium: #c8e6d7;
+    --green-accent: #7fbea0;
+    --text-primary: #1a332b;
+    --text-secondary: #446b5d;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    width: 50%;
+    max-width: 700px;
+    margin: 20px auto;
+    padding: 30px;
+    background: linear-gradient(135deg, 
+        var(--green-light) 100%,
+        var(--green-medium) 50%,
+        var(--green-light) 0%
+    );
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(127, 190, 160, 0.3);
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;  
+    pointer-events: none;
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+    text-align: center;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(to right, var(--green-accent), var(--button-color));
+    border-radius: 3px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 1;
+    background: linear-gradient(145deg, #ffffff, var(--green-light));
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+
+
+label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.form-group:hover label {
+    color: var(--button-color);
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--green-medium);
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0.9),
+        rgba(200, 230, 215, 0.9)
+    );
+    transition: all 0.3s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--button-color);
+    box-shadow: 0 0 0 4px rgba(0, 86, 59, 0.1);
+    transform: translateY(-2px);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--button-color), var(--button-hover));
+    color: white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    align-self: center;
+    min-width: 150px;
+}
+
+button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--button-hover), var(--button-color));
+    transition: left 0.5s ease;
+    z-index: -1;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0, 86, 59, 0.4);
+}
+
+button:hover::before {
+    left: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+        padding: 20px;
+        margin: 10px auto;
+    }
+
+    form {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+
+    input, textarea, select {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    button {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+    }
+}
