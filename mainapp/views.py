@@ -168,6 +168,27 @@ def logtrip(request):
             public_transport=public_transport_option,
             greener_travel=greener_travel
         )
+        today = timezone.now().date() 
+        print(f"[DEBUG] Today's Date: {today}")
+
+        existing_trips = TripLog.objects.filter(user=user, date=today)
+        print(f"[DEBUG] Existing trips for today: {[trip.id for trip in existing_trips]}")
+        if existing_trips.count() == 1:
+            print("[DEBUG] No previous trips found for today, awarding coins.")
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                print(f"[DEBUG] Current Coins: {user_profile.coins}")
+                user_profile.coins += 50 
+                user_profile.streak +=1
+                user_profile.save()
+                print(f"[DEBUG] New Coins after Award: {user_profile.coins}")
+                messages.success(request, 'You earned 50 coins for your first trip today!')
+                messages.success(request, 'Your streak was increased 1')
+            except UserProfile.DoesNotExist:
+                messages.error(request, 'User profile not found. Contact support.')
+                return redirect('logtrip')
+        else:
+            print("[DEBUG] Trip already logged for today.")
         messages.success(request, "Trip Logged Successfully!")
         return redirect("logtrip")
     
@@ -178,28 +199,7 @@ def logtrip(request):
     page_number = request.GET.get("page")  # Get the page number from URL
     trip_logs_page = paginator.get_page(page_number)
 
-    today = timezone.now().date() 
-    print(f"[DEBUG] Today's Date: {today}")
-
-    existing_trips = TripLog.objects.filter(user=user, date=today)
-    print(f"[DEBUG] Existing trips for today: {[trip.id for trip in existing_trips]}")
-    if existing_trips.count() == 1:
-        print("[DEBUG] No previous trips found for today, awarding coins.")
-        try:
-            user_profile = UserProfile.objects.get(user=user)
-            print(f"[DEBUG] Current Coins: {user_profile.coins}")
-            user_profile.coins += 50 
-            user_profile.streak +=1
-            user_profile.save()
-            print(f"[DEBUG] New Coins after Award: {user_profile.coins}")
-            messages.success(request, 'You earned 50 coins for your first trip today!')
-            messages.success(request, 'Your streak was increased 1')
-        except UserProfile.DoesNotExist:
-            messages.error(request, 'User profile not found. Contact support.')
-            return redirect('logtrip')
-    else:
-        print("[DEBUG] Trip already logged for today.")
-        messages.success(request, 'Trip logged successfully!')
+    
     return render(request, "mainapp/logtrip.html", {"trip_logs": trip_logs_page})
 
 
