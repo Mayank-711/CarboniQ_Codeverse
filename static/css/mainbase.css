@@ -20,7 +20,7 @@ body {
     background-color: var(--green-light);
     color: #1a332b;
 }
-
+/*
 
 .navbar {
     display: flex;
@@ -29,7 +29,7 @@ body {
     padding: 10px 20px;
     color: #ffffff;
     background: linear-gradient(to bottom, #7fcd65 0%, transparent 100%);
-    
+
 }
 .navbar.scrolled {
     background-color: var(--green-primary);
@@ -87,7 +87,7 @@ body {
 }
 
 /* New underline animation styles */
-.navbar .nav-links a::after {
+/* .navbar .nav-links a::after {
     content: '';
     position: absolute;
     width: 0;
@@ -101,12 +101,12 @@ body {
 
 .navbar .nav-links a:hover::after {
     width: 100%;
-}
+} */
 
 /* Remove the default underline on hover */
-.navbar .nav-links a:hover h3 {
+/* .navbar .nav-links a:hover h3 {
     text-decoration: none;
-}
+}  */
 
 
 .main-content {
