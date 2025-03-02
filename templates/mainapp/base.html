@@ -47,13 +47,15 @@
     <!-- Navbar -->
     <header class="navbar">
         <div class="logo">
-            <img src="{% static 'images/logo1.png' %}" alt="CarbonIQ Logo">
-            <h1>CarbonIQ</h1>
+            <a href="{% url 'homepage' %}">
+                <img src="{% static 'images/logo1.png' %}" alt="CarbonIQ Logo">
+            </a>
+            <h1><a href="{% url 'homepage' %}" style="text-decoration: none; color: inherit;">CarbonIQ</a></h1>
         </div>
         <div class="nav-links">
             <ul>
                 <li><a href="{% url 'homepage' %}"><h3>Home</h3></a></li>
-                <li><a href="{% url 'logtrip' %}"><h3>TripLog</h3></a></li>
+                <li><a href="{% url 'logtrip' %}"><h3>Your Trip</h3></a></li>
                 <li><a href="{% url 'leaderboards' %}"><h3>Leaderboard</h3></a></li>
                 <li><a href="{% url 'challenge' %}"><h3>Challenges</h3></a></li>
                 <li><a href="{% url 'view_profile' user_id=user.id %}"><h3>Profile</h3></a></li>
