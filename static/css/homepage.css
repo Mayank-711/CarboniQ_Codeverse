@@ -305,7 +305,7 @@ canvas {
 
 /* Form-specific styles */
 .form-container {
-    max-width: 50%;
+    max-width: 100%;
     color: #E5F6DF; /* Light green text */
     position: relative;
     flex-shrink: 0;
@@ -443,6 +443,7 @@ canvas {
     color: #00563B; /* Dark green text */
     font-size: 16px;
     cursor: pointer;
+    width: 100%;
 }
 
 .form-container button:hover {
