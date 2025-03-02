@@ -19,7 +19,7 @@ def adminlogin(request):
         if username in ADMIN_CREDENTIALS and ADMIN_CREDENTIALS[username] == password:
             # Set session variable
             request.session['admin_logged_in'] = True  # Optional: Track admin login status
-            return redirect('managestore')  # Redirect to admin dashboard
+            return redirect('manage_stores')  # Redirect to admin dashboard
         else:
             return redirect('adminlogin')  # Redirect back if credentials are incorrect
 
