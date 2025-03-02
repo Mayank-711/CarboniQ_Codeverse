@@ -1,7 +1,7 @@
 /* Advanced General Styles */
 body {
     font-family: 'Arial', sans-serif;
-    background: 
+    background:
         linear-gradient(120deg, rgba(17, 139, 68, 0.1), transparent 70%),
         linear-gradient(240deg, rgba(71, 182, 73, 0.1), transparent 70%),
         linear-gradient(135deg, #f4f7f6, #e0e5ec);
@@ -20,6 +20,7 @@ html {
 .container {
     max-width: 1200px;
     margin: 0 auto;
+    margin-top: 30px;
     padding: 30px;
     position: relative;
     animation: fadeIn 1s ease-in-out;
@@ -71,7 +72,7 @@ h2.graph-title {
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     animation: slideInUp 1s ease-in-out;
-    box-shadow: 
+    box-shadow:
         8px 8px 16px rgba(209, 209, 209, 0.5),
         -8px -8px 16px rgba(255, 255, 255, 0.8);
     overflow: hidden;
@@ -108,7 +109,7 @@ h2.graph-title {
 .stat-card:hover {
     transform: translateY(-10px) scale(1.02);
     background: linear-gradient(135deg, #118B44, #47B649);
-    box-shadow: 
+    box-shadow:
         0 15px 30px rgba(17, 139, 68, 0.2),
         0 8px 16px rgba(17, 139, 68, 0.1);
 }
@@ -292,7 +293,7 @@ canvas {
 }
 
 /* Shared Container Styles */
-.form-container, 
+.form-container,
 .chats {
     background-color: #58ab90; /* Same green background */
     padding: 20px;
