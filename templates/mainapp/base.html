@@ -202,7 +202,6 @@
 
 
 
-        /* Chatbot Styles */
     </style>
 
     {% block extra_head %}{% endblock %}
@@ -213,8 +212,10 @@
     <!-- Navbar -->
     <header class="navbar">
         <div class="logo">
-            <img src="{% static 'images/logo1.png' %}" alt="CarbonIQ Logo">
-            <h1>CarbonIQ</h1>
+            <a href="{% url 'homepage' %}">
+                <img src="{% static 'images/logo1.png' %}" alt="CarbonIQ Logo">
+            </a>
+            <h1><a href="{% url 'homepage' %}" style="text-decoration: none; color: inherit;">CarbonIQ</a></h1>
         </div>
         <button class="menu-toggle" onclick="toggleMenu()">☰</button>
         <nav class="nav-links">
@@ -269,6 +270,7 @@
     <!-- Chatbot Floating Button -->
     <button class="fab btn" data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="GreenBot"
         onclick="toggleChatbot()">💬</button>
+
 
     <!-- Chatbot -->
     <div class="chatbot-container" id="chatbot">
