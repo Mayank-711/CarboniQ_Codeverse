@@ -35,7 +35,7 @@ html {
 .container h1 {
     text-align: center;
     color: #2c3e50;
-    font-size: 2.5rem;
+    font-size: 2rem;
     margin-bottom: 30px;
     position: relative;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -144,7 +144,7 @@ h2.graph-title {
 .dashboard {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 10px;
     margin-bottom: 40px;
 }
 
@@ -214,6 +214,9 @@ canvas {
         margin: 15px;
         padding: 20px;
     }
+    .container h1{
+        margin-top: 2rem
+    };
 
     .stats-container {
         gap: 20px;
@@ -232,7 +235,7 @@ canvas {
 
 @media (max-width: 480px) {
     h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
 
     h2.graph-title {

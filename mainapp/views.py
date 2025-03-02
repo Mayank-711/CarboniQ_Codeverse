@@ -24,7 +24,7 @@ from .models import Challenge, UserChallenge
 def homepage(request):
     user = request.user
     today = now().date()
-    
+
     # Weekly Data
     week_start = today - timedelta(days=6)
     weekly_trips = TripLog.objects.filter(user=user, date__range=[week_start, today])
@@ -94,7 +94,7 @@ def homepage(request):
 @login_required(login_url='/login/')
 def logtrip(request):
     user = request.user
-    
+
     if request.method == "POST":
         source_address = request.POST.get("source")
         source_lat = request.POST.get("source_lat")
@@ -196,8 +196,8 @@ def logtrip(request):
         return redirect("logtrip")
 
     # Fetch all trips for the user and paginate (5 logs per page)
-    trip_logs = TripLog.objects.filter(user=user).order_by("-date", "-created_at") 
-    paginator = Paginator(trip_logs, 5)
+    trip_logs = TripLog.objects.filter(user=user).order_by("-date", "-created_at")
+    paginator = Paginator(trip_logs, 3)
     page_number = request.GET.get("page")
     trip_logs_page = paginator.get_page(page_number)
 
@@ -212,7 +212,7 @@ def get_predictions(mode_of_transport, passengers, distance, time,time_taken):
 
     # Adjust passenger count for electric vehicles
     passengers = float(passengers)
-    
+
 
     # Call the ML model prediction function
     co2_count = predict_co2_emission(mode_of_transport, passengers, distance, time)
@@ -227,7 +227,7 @@ def get_predictions(mode_of_transport, passengers, distance, time,time_taken):
         carbonfootprint_per_min = co2_count / time
         extra_co2 = extra_time * carbonfootprint_per_min
         co2_count += extra_co2
-    
+
     return co2_count
 
 
@@ -281,7 +281,7 @@ def friend_leaderboards(user):
     # Get friends' IDs
     friends_from_user = Friendship.objects.filter(from_user=user, accepted=True).values_list('to_user', flat=True)
     friends_to_user = Friendship.objects.filter(to_user=user, accepted=True).values_list('from_user', flat=True)
-    
+
     # Combine both lists to get all friends and include the user themselves
     friends_ids = set(friends_from_user) | set(friends_to_user)
     friends_ids.add(user.id)  # Include the logged-in user
@@ -351,7 +351,7 @@ def process_form(request):
         source_add = request.POST.get('source-add')
         dest_add = request.POST.get('destination-add')
 
-    
+
 
         if source_lat and source_lng and dest_lat and dest_lng:
             try:
@@ -368,15 +368,15 @@ def process_form(request):
                     'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                 }
 
-            
+
 
                 # Make the API request
                 response = requests.post('https://api.olamaps.io/routing/v1/directions', params=params)
-            
+
 
                 if response.status_code == 200:
                     data = response.json()
-                   
+
 
                     if 'routes' in data and data['routes']:
                         legs = data['routes'][0]['legs']
@@ -385,28 +385,25 @@ def process_form(request):
                         total_distance = round(total_distance, 2)
                         total_duration = round(total_duration, 2)
 
-                       
+
 
                         # Transport types and their CO2 emissions
                         list_of_transport = {
                             "Bus": 50, "Electric Bus": 10, "AC Bus": 80, "Electric AC Bus": 10,
                             "Train": 41, "Electric Train": 10, "AC Train": 50, "Electric AC Train": 10,
-                            "Car 1 Passenger": 128, "Electric Car 1 Passenger": 80,
-                            "Car 2 Passenger": 64, "Electric Car 2 Passenger": 50,
-                            "Car 3 Passenger": 48, "Electric Car 3 Passenger": 30,
-                            "Car 4 Passenger": 32, "Electric Car 4 Passenger": 20,
-                            "Bike 1 Passenger": 50, "Electric Bike 1 Passenger": 20,
-                            "Bike 2 Passenger": 40, "Electric Bike 2 Passenger": 20,
-                            "Rickshaw 1 Passenger": 100, "Electric Rickshaw 1 Passenger": 30,
-                            "Rickshaw 2 Passenger": 80, "Electric Rickshaw 2 Passenger": 20,
-                            "Rickshaw 3 Passenger": 70, "Electric Rickshaw 3 Passenger": 10,
-                            "Scooter 1 Passenger": 50, "Electric Scooter 1 Passenger": 20,
-                            "Scooter 2 Passenger": 40, "Electric Scooter 2 Passenger": 10,
+                            "Car": 128, "Electric Car": 80,
+
+                            "Bike": 50, "Electric Bike": 20,
+
+                            "Rickshaw": 100, "Electric Rickshaw": 30,
+
+                            "Scooter": 50, "Electric Scooter": 20,
+
                             "Walk": 0, "Bicycle": 0
                         }
 
                         carbon_footprint_perkm = {mode: round(value * total_distance, 2) for mode, value in list_of_transport.items()}
-                      
+
 
                         # Nearby places search
                         # ✅ Corrected Nearby Search API Request
@@ -420,16 +417,16 @@ def process_form(request):
                             'limit': 5,
                             'api_key': 'upIsbo0X7RjH2SfHjy2eYpm8TWdynT6vFDCpA85y'
                         }
-                        
+
 
                         headers = {'accept': 'application/json'}
                         nearby_response = requests.get(url, headers=headers, params=nearby_params)
-                        
+
 
                         nearby_bus_stops = []
                         if nearby_response.status_code == 200:
                             nearby_data = nearby_response.json()
-                            
+
 
                             if 'predictions' in nearby_data:
                                 for place in nearby_data['predictions']:
@@ -438,7 +435,7 @@ def process_form(request):
                                 pass
 
                         nearby_bus_stops_str = ', '.join(nearby_bus_stops)
-                        
+
 
                         # ✅ Saving Data to Database
                         chat_entry = Chat.objects.create(
@@ -457,7 +454,7 @@ def process_form(request):
                             Nearby_Bus_Stops=nearby_bus_stops_str
                         )
 
-                        
+
                         return redirect('homepage')
 
                     else:
@@ -489,7 +486,7 @@ def get_user_stats(request):
         })
     except UserProfile.DoesNotExist:
         return JsonResponse({"error": "User profile not found"}, status=404)
-    
+
 
 
 genai.configure(api_key="AIzaSyCZdYc3yTjT0HWSyoQcele55PFY6Hs41QY")
@@ -520,7 +517,7 @@ def chatbot_response(request):
 from django.db import transaction
 
 @login_required
-@csrf_exempt  
+@csrf_exempt
 def daily_challenge_view(request):
     user = request.user
     today = timezone.localtime(timezone.now()).date()

@@ -4,14 +4,12 @@
 
 {% block title %}Daily Challenge{% endblock %}
 
+
+
 {% block extra_head %}
 <style>
     /* General Styles */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f5f5f5;
-        color: #333;
-    }
+
 
     /* Message Box */
     .messages {
@@ -46,7 +44,7 @@
         background: green;
         color: white !important;  /* Ensure text remains visible */
         font-weight: bold;
-    }    
+    }
     .not-completed { color: red; }
     .btn-complete {
         background: #28a745;
@@ -57,7 +55,8 @@
         cursor: pointer;
         font-size: 16px;
         transition: background 0.3s ease-in-out;
-
+        margin: 5px auto; /* Centers the button */
+    display: block;
     }
     .btn-complete:hover { background: #218838; }
     .btn-complete:disabled { background: gray; cursor: not-allowed; }
@@ -93,16 +92,10 @@
     .btn-complete:hover { background: #218838; }
     .btn-complete:disabled { background: gray; cursor: not-allowed; }
 
-    body {
-        font-family: 'Arial', sans-serif;
-        background-color: #f5f5f5;
-        color: #333;
-    }
+
 
     /* Table Container */
     .table-container {
-        width: 90%;
-        max-width: 800px;
         margin: 40px auto;
         background: white;
         padding: 20px;
@@ -119,7 +112,6 @@
 
     /* Table Styling */
     table {
-        width: 100%;
         border-collapse: collapse;
         text-align: center;
         background: white;
@@ -195,7 +187,7 @@
     }
 
     .challenges-container-2 {
-        max-width: 75%;
+
         margin: 5px auto;
         background-color: #f4f4f4;
         padding: 20px;
@@ -204,7 +196,7 @@
         color: #333;
         font-family: 'Arial', sans-serif;
     }
-    
+
     .challenges-container h2 {
         text-align: left;
         color: #2c6e49;
@@ -249,57 +241,59 @@
 
 {% block content %}
 
-<div class="title-challenges">
-    <h1>Daily Challenges</h1>
-</div>
-<!-- Display Messages -->
-<ul class="messages">
-    {% for message in messages %}
-        <li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
-    {% endfor %}
-</ul>
+<div style="margin-top: 4rem;">
+    <div class="title-challenges">
+        <h1>Daily Challenges</h1>
+    </div>
+    <!-- Display Messages -->
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</li>
+        {% endfor %}
+    </ul>
 
-<!-- Daily Challenge Box -->
-<div id="dailyChallengeBox" class="challenges-container">
-    <p id="challengeTitle">Loading...</p>
-    <h3 id="challengeDesc"></h3>
-    
-    <h3 id="challengeStatus" class="challenge-status not-completed">Status: Not Completed ❌</h3>
-    <button id="completeChallengeBtn" class="btn-complete" style="margin:5px 500px">Mark as Completed</button>
-</div>
+    <!-- Daily Challenge Box -->
+    <div id="dailyChallengeBox" class="challenges-container">
+        <p id="challengeTitle">Loading...</p>
+        <h3 id="challengeDesc"></h3>
 
-<!-- Tracker Section -->
-<div class="challenges-container-2">
-    <h2 style="text-align: center;">Tracker</h2>
+        <h3 id="challengeStatus" class="challenge-status not-completed">Status: Not Completed ❌</h3>
+        <button id="completeChallengeBtn" class="btn-complete" >Mark as Completed</button>
+    </div>
 
-    <table border="1" width="80%" align="center" style="border-collapse: collapse; text-align: center;">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Title</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for challenge in challenges %}
-            <tr>
-                <td>{{ challenge.assigned_date }}</td>
-                <td>{{ challenge.challenge.title }}</td>
-                <td>
-                    {% if challenge.completed %}
-                        ✅ Completed
-                    {% else %}
-                        ❌ Not Completed
-                    {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No challenges found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Tracker Section -->
+    <div class="challenges-container-2">
+        <h2 style="text-align: center;">Tracker</h2>
+
+        <table border="1" width="80%" align="center" style="border-collapse: collapse; text-align: center;">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for challenge in challenges %}
+                <tr>
+                    <td>{{ challenge.assigned_date }}</td>
+                    <td>{{ challenge.challenge.title }}</td>
+                    <td>
+                        {% if challenge.completed %}
+                            ✅ Completed
+                        {% else %}
+                            ❌ Not Completed
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No challenges found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -325,7 +319,7 @@
 
     document.getElementById("completeChallengeBtn").addEventListener("click", async function () {
         try {
-            const response = await fetch("{% url 'daily_challenge_view' %}", { 
+            const response = await fetch("{% url 'daily_challenge_view' %}", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
