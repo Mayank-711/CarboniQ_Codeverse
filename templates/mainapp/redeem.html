@@ -9,10 +9,8 @@
 {% block content %}
     <div class="feedback-container">
         <div class="coin-balance">
-            <h3>Coin Balance</h3>
-            <p>{{ coin_balance }} coins</p>
             <div class="stores-section">
-                <h4>Redeem Your Coins At:</h4>
+                <div style="display: flex; justify-content: space-between; color :black;"> <h4>Redeem Your Coins At:</h4> <p>{{ coin_balance }} coins</p></div>
                 <div class="store-cards">
                     {% for store in stores %}
                         <div class="store-card">
@@ -22,7 +20,7 @@
                             <div class="store-details">
                                 <h4>{{ store.store_name }}</h4>
                                 <p class="offer-text">{{ store.description }}</p>
-                                <button class="redeem-btn">Redeem</button>
+                                <button class="redeem-btn" type="button" onclick="onclick1()">Redeem</button>
                             </div>
                         </div>
                     {% empty %}
@@ -37,9 +35,9 @@
 {% block extra_scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        AOS.init({
+        {% comment %} AOS.init({
             disable: true  // Disable AOS for testing
-        });
+        }); {% endcomment %}
         $(document).ready(function() {
             const $storeCards = $('.store-card');
             const visibleCards = 2; // Number of cards visible initially
@@ -61,6 +59,10 @@
                 }
             });
         });
+
+        function onclick1(){
+            alert("Coupon redeemed");
+        }
         
     </script>
 {% endblock %}
