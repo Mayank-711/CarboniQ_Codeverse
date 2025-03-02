@@ -1,3 +1,4 @@
+from adminside.models import Store
 from collections import defaultdict
 import json
 import random
@@ -78,13 +79,14 @@ def homepage(request):
         'emission_values': emission_values,  # Outer pie (Emissions)
         'daily_labels': daily_labels,
         'daily_values': daily_values,
+        'avg_daily_values': [5, 100, 150, 20, 3453.04, 350.02, 276.47],
         'monthly_labels': monthly_labels,
         'monthly_values': monthly_values,
+        'avg_monthly_values': [5, 10, 15, 20, 8, 12, 7, 9, 14, 22, 17, 30,11, 19, 24, 16, 21, 13, 27, 33, 26, 29, 14,38,42, 50, 2547.04, 334.02, 276.47],
         'total_trips': total_trips,
         'greener_trips': greener_trips,
         'public_trips': public_trips,
-        'total_co2_emission': total_co2_emission
-    }
+        'total_co2_emission': total_co2_emission }
     last_chat = Chat.objects.filter(user=user).order_by('-search_date', '-search_time').first()
     return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data),'chats':last_chat})
 
@@ -571,3 +573,19 @@ def dailychallenge(request):
     return render(request, 'mainapp/dailychallenge.html', {
         "challenges": challenges
     })
+
+
+@login_required(login_url='/login/')
+def redeem(request):
+    user = request.user
+    coin_balance = 0  
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+        coin_balance = user_profile.coins  # Fetch user's coin balance
+        print(f"[DEBUG] Retrieved coin balance: {coin_balance} for user: {user.username}")
+    except UserProfile.DoesNotExist:
+        coin_balance = 0  # If user profile does not exist, set to 0
+        print(f"[DEBUG] UserProfile does not exist for user: {user.username}")
+
+    stores = Store.objects.all()  
+    return render(request, 'mainapp/redeem.html', {'coin_balance': coin_balance,'stores': stores})

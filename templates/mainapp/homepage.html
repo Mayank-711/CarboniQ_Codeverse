@@ -160,10 +160,17 @@
             data: {
                 labels: graphData.daily_labels,
                 datasets: [{
-                    label: 'CO₂ Emission (g) - Weekly',
+                    label: 'User CO₂ Emission (g) - Weekly',
                     data: graphData.daily_values,
                     borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    // backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Average CO₂ Emission (g) - Weekly',
+                    data: graphData.avg_daily_values,
+                    borderColor: '#000',
+                    // backgroundColor: 'rgba(0, 123, 255, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]
@@ -184,10 +191,17 @@
             data: {
                 labels: graphData.monthly_labels,
                 datasets: [{
-                    label: 'CO₂ Emission (g) - Monthly',
+                    label: 'User CO₂ Emission (g) - Monthly',
                     data: graphData.monthly_values,
                     borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    // backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Average Emission (g) - Monthly',
+                    data: graphData.avg_monthly_values,
+                    borderColor: '#000',
+                    // backgroundColor: 'rgba(40, 167, 69, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]
