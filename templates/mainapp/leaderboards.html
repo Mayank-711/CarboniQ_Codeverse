@@ -45,8 +45,8 @@
                                 {% endif %}
                             </div>
                             <span>{{ entry.user__username }}</span>
-                            <span>Total Distance: {{ entry.total_distance }}km</span>
-                            <span>Total CarbonFootprint: {{ entry.total_carbon }}g</span>
+                            <span>{{ entry.total_distance }}km</span>
+                            <span>CF: {{ entry.total_carbon }}g</span>
                             <span>Ratio: {{ entry.efficiency }} g/km</span>
                         </li>
                     {% endfor %}
@@ -90,9 +90,9 @@
                                 {% endif %}
                             </div>
                             <span>{{ entry.user__username }}</span>
-                            <span>Total Distance: {{ entry.total_distance }}km</span>
-                            <span>Total CarbonFootprint: {{ entry.total_carbon }}g</span>
-                            <span>Ratio: {{ entry.efficiency }} g/km</span>
+                            <span>{{ entry.total_distance }}km</span>
+                            <span>{{ entry.total_carbon }}g</span>
+                            <span>Ratio:{{ entry.efficiency }} g/km</span>
                         </li>
                     {% endfor %}
                 </ul>
