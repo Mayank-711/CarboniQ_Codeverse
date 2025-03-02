@@ -22,7 +22,7 @@ encoder.fit(pd.DataFrame(transport_modes, columns=["mode_of_transport"]))
 
 
 def predict_co2_emission(mode_of_transport: str, passengers: int, distance: float, time: float) -> float:
-    """
+    """+
     Predicts the CO₂ emissions based on mode of transport, passenger count, distance, and time.
     """
 
