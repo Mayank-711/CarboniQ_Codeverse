@@ -21,6 +21,19 @@ from .models import Challenge, UserChallenge
 
 
 
+
+import joblib
+import numpy as np
+import os
+from django.http import JsonResponse
+from .models import Chat
+model_path = os.path.join(os.path.dirname(__file__), "ml", "models", "vehicle_recommendation_model.pkl")
+model = joblib.load(model_path)
+
+
+
+
+
 @login_required(login_url='/login/')
 def homepage(request):
     user = request.user
@@ -88,7 +101,26 @@ def homepage(request):
         'public_trips': public_trips,
         'total_co2_emission': total_co2_emission }
     last_chat = Chat.objects.filter(user=user).order_by('-search_date', '-search_time').first()
-    return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data),'chats':last_chat})
+    
+    # Vehicle Prediction
+    best_vehicle_1, best_vehicle_2 = None, None  # Default values
+
+    if last_chat:
+        time = last_chat.duration
+        distance = last_chat.distance
+
+        input_data = np.array([[time, distance]])
+        prediction = model.predict(input_data)
+
+        best_vehicle_1, best_vehicle_2 = prediction[0][0], prediction[0][1]
+
+    return render(request, 'mainapp/homepage.html', {
+        'graph_data': json.dumps(graph_data),
+        'chats': last_chat,
+        'best_vehicle_1': best_vehicle_1,
+        'best_vehicle_2': best_vehicle_2
+    })
+    
 
 
 

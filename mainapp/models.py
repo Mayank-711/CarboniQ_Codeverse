@@ -50,7 +50,6 @@ class Chat(models.Model):
         return f"Trip from {self.source_address} to {self.destination_address} on {self.search_date}"
     
 
-
 class Challenge(models.Model):
     title = models.CharField(max_length=255, unique=True)
     description = models.TextField()
