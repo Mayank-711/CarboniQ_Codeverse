@@ -536,7 +536,7 @@ def chatbot_response(request):
                 return JsonResponse({"error": "No message provided"}, status=400)
 
             # Call Google AI Model
-            model = genai.GenerativeModel("tunedModels/carboniq-chatbot-ggspakmqlsyw")
+            model = genai.GenerativeModel("tunedModels/carboniqchatbot-8wq12ep5zbg4")
             response = model.generate_content(user_message)
 
             return JsonResponse({"response": response.text})
