@@ -523,7 +523,7 @@ def get_user_stats(request):
 
 
 
-genai.configure(api_key="AIzaSyCZdYc3yTjT0HWSyoQcele55PFY6Hs41QY")
+genai.configure(api_key="AIzaSyDKDcQ2KhFZjvW0XFu5cKeMvu0uLONeJzQ")
 
 @csrf_exempt  # Disable CSRF for simplicity (Better to use tokens in production)
 def chatbot_response(request):
@@ -536,7 +536,7 @@ def chatbot_response(request):
                 return JsonResponse({"error": "No message provided"}, status=400)
 
             # Call Google AI Model
-            model = genai.GenerativeModel("tunedModels/carboniqchatbot-8wq12ep5zbg4")
+            model = genai.GenerativeModel("tunedModels/carboniqchatbot-owu3m910u2w9")
             response = model.generate_content(user_message)
 
             return JsonResponse({"response": response.text})
