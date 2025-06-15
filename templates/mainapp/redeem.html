@@ -1,0 +1,68 @@
+{% extends 'mainapp/base.html' %}
+{% load static %}
+{% block title %}Redeem{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/redeem.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="feedback-container">
+        <div class="coin-balance">
+            <div class="stores-section">
+                <div style="display: flex; justify-content: space-between; color :black;"> <h4>Redeem Your Coins At:</h4> <p>{{ coin_balance }} coins</p></div>
+                <div class="store-cards">
+                    {% for store in stores %}
+                        <div class="store-card">
+                            <div class="store-logo-container">
+                                <img src="{{ store.logo.url }}" alt="{{ store.store_name }} Logo" class="store-logo">
+                            </div>
+                            <div class="store-details">
+                                <h4>{{ store.store_name }}</h4>
+                                <p class="offer-text">{{ store.description }}</p>
+                                <button class="redeem-btn" type="button" onclick="onclick1()">Redeem</button>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="no-stores">No stores available for redemption.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        {% comment %} AOS.init({
+            disable: true  // Disable AOS for testing
+        }); {% endcomment %}
+        $(document).ready(function() {
+            const $storeCards = $('.store-card');
+            const visibleCards = 3; // Number of cards visible initially
+            const $storesSection = $('.stores-section');
+        
+            // Hide all but the first two cards
+            $storeCards.slice(visibleCards).hide();
+        
+            // Show more cards on scroll
+            $storesSection.on('scroll', function() {
+                const scrollTop = $storesSection.scrollTop();
+                const sectionHeight = $storesSection.height();
+                const scrollHeight = $storesSection.prop('scrollHeight');
+        
+                // Calculate how much has been scrolled and load more cards
+                if (scrollTop + sectionHeight >= scrollHeight - 50) {
+                    const hiddenCards = $storeCards.filter(':hidden');
+                    hiddenCards.slice(0, visibleCards).fadeIn(); // Show two more cards as user scrolls
+                }
+            });
+        });
+
+        function onclick1(){
+            alert("Coupon redeemed");
+        }
+        
+    </script>
+{% endblock %}

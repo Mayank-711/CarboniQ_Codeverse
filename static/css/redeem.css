@@ -1,0 +1,131 @@
+/* EcoVoyage Color Theme */
+:root {
+    --primary-color: #00563B;  /* Dark Green */
+    --secondary-color: #E5F6DF;  /* Light Green */
+    --accent-color: #ffffff;  /* White background */
+    --text-color: #333;  /* Text color */
+    --border-color: #ccc;  /* Border for inputs */
+    --hover-color: #27ae60;  /* Darker green on hover */
+}
+
+/* Coin Balance Section */
+.coin-balance {
+    margin: 0 auto;
+    margin-top: 80px;
+    background-color: var(--primary-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    text-align: center;
+    color: var(--accent-color);
+    font-size: 20px;
+    width: 60%; /* Increased width for better alignment */
+}
+
+.coin-balance h3 {
+    margin-top: 0;
+    font-size: 22px;
+    color: var(--accent-color);
+}
+
+/* Stores Section */
+.stores-section h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.stores-section {
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    padding: 20px;
+    height: 400px; /* Set a fixed height to ensure the content fits */
+    overflow-y: auto !important; /* Add !important to enforce this style */
+}
+
+/* Store Cards Wrapper */
+.store-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive grid layout */
+    gap: 20px; /* Adds space between the cards */
+    overflow-y: auto;  /* Enable vertical scrolling */
+    padding-right: 10px; /* Adds padding to avoid content being hidden by scrollbar */
+}
+
+
+/* Store Card */
+.store-card {
+    background-color: var(--accent-color);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 200px; /* Minimum size for store cards */
+}
+
+
+/* Store Logo Container */
+.store-logo-container {
+    flex-shrink: 0;
+    margin-bottom: 10px;
+}
+
+.store-logo {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Ensure it scales properly */
+    border-radius: 50%;
+}
+
+/* Store Details */
+.store-details {
+    text-align: center; /* Center align text */
+    color: black;
+}
+
+.store-details h4 {
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+.offer-text {
+    color: black;
+    font-weight: normal;
+    margin: 5px 0;
+}
+
+/* Redeem Button */
+.redeem-btn {
+    background-color: var(--primary-color);
+    color: var(--accent-color);
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+
+}
+
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+
+    .coin-balance, .feedback-section {
+        width: 100%;  /* Full width on smaller screens */
+    }
+
+    .stores-section {
+        margin-top: 20px;  /* Space above stores section on smaller screens */
+    }
+
+    .store-card {
+        width: 100%; /* Full width for cards on smaller screens */
+    }
+}

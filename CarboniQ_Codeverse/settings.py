@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'mainapp',
     'authapp',
+    'adminside',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -138,3 +139,8 @@ MEDIA_URL = '/media/'
 # settings.py
 TIME_ZONE = "Asia/Kolkata"  # Change to your preferred timezone
 USE_TZ = True  # Enable timezone support
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# The URL path for accessing the media files
+MEDIA_URL = '/media/'

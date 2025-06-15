@@ -20,7 +20,7 @@ from CarboniQ_Codeverse import settings
 from mainapp import views as mviews
 from authapp import views as aviews
 from django.conf.urls.static import static
-
+from adminside import views as kviews
 urlpatterns = [
     path('admin/', admin.site.urls),
 ]
@@ -33,7 +33,7 @@ mainappurl = [
     path ('process_form/',mviews.process_form,name='process_form'),
     path("get-user-stats/", mviews.get_user_stats, name="get_user_stats"),
     path("chatbot-response/",mviews.chatbot_response,name='chatbot-response'),
-    # path('assign-challenge/', mviews.assign_daily_challenge, name='assign_daily_challenge'),
+    path('redeem/',mviews.redeem,name='redeem'),
     path('dailychallenge/',mviews.dailychallenge,name='challenge'),
     path('completechallenge/',mviews.daily_challenge_view,name='daily_challenge_view')
 
@@ -56,9 +56,16 @@ authappurl = [
     path('search/', aviews.search_users, name='search_users'),
 ]
 
+adminurl =[
+path('admin_login/', kviews.adminlogin, name='adminlogin'),
+path('add_store/', kviews.add_store, name='addstore'),
+path('admin_logout',kviews.admin_logout,name='adlogout'),
+path('manage-stores/', kviews.manage_stores, name='manage_stores'),
+path('edit-store/<int:store_id>/', kviews.edit_store, name='edit_store'),
+path('delete-store/<int:store_id>/', kviews.delete_store, name='delete_store'),
+]
 
-
-urlpatterns = mainappurl + authappurl + urlpatterns
+urlpatterns = mainappurl + authappurl + urlpatterns + adminurl
 
 
 if settings.DEBUG:

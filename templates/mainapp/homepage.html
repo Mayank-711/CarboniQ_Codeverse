@@ -76,6 +76,7 @@
             <button type="submit" id="calculate-button">Calculate Carbon Footprint</button>
         </form>
     </div>
+    
     <div class="chats">
         <div class="chat-entries"> 
             {% if chats %}
@@ -88,15 +89,22 @@
                             <p><strong>Duration:</strong> {{ chats.duration }} mins</p>
                             <p><strong>Date:</strong> {{ chats.search_date }}</p>
                             <p><strong>Time:</strong> {{ chats.search_time }}</p>
-                            <p><strong>Nearby PublicTransport:</strong> {{ chats.Nearby_Bus_Stops }}</p>
+                            <p><strong>Nearby Public Transport:</strong> {{ chats.Nearby_Bus_Stops }}</p>
                         </div>
                         <div class="chat-column">
+                            <!-- Suggested Vehicles Section -->
+                            <div class="recommended-vehicles">
+                                <h3>Recommended Green Vehicles</h3>
+                                <p><strong>Best Vehicle 1:</strong> {{ best_vehicle_1 }}</p>
+                                <p><strong>Best Vehicle 2:</strong> {{ best_vehicle_2 }}</p>
+                            </div>
                             <div class="carbon-footprint">
                                 <p><strong>Carbon Footprint:</strong></p>
                                 {% for mode, footprint in chats.carbon_footprint.items %}
                                     <p>{{ mode }}: {{ footprint }} g</p>
                                 {% endfor %}
                             </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -105,8 +113,8 @@
             {% endif %}
         </div>
     </div>
-    
 </div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // Data from Django Backend
@@ -160,10 +168,17 @@
             data: {
                 labels: graphData.daily_labels,
                 datasets: [{
-                    label: 'CO₂ Emission (g) - Weekly',
+                    label: 'User CO₂ Emission (g) - Weekly',
                     data: graphData.daily_values,
                     borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    // backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Average CO₂ Emission (g) - Weekly',
+                    data: graphData.avg_daily_values,
+                    borderColor: '#000',
+                    // backgroundColor: 'rgba(0, 123, 255, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]
@@ -184,10 +199,17 @@
             data: {
                 labels: graphData.monthly_labels,
                 datasets: [{
-                    label: 'CO₂ Emission (g) - Monthly',
+                    label: 'User CO₂ Emission (g) - Monthly',
                     data: graphData.monthly_values,
                     borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    // backgroundColor: 'rgba(40, 167, 69, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }, {
+                    label: 'Average Emission (g) - Monthly',
+                    data: graphData.avg_monthly_values,
+                    borderColor: '#000',
+                    // backgroundColor: 'rgba(40, 167, 69, 0.2)',
                     fill: true,
                     tension: 0.3
                 }]

@@ -1,3 +1,4 @@
+from adminside.models import Store
 from collections import defaultdict
 import json
 import random
@@ -17,6 +18,19 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import google.generativeai as genai
 from .models import Challenge, UserChallenge
+
+
+
+
+import joblib
+import numpy as np
+import os
+from django.http import JsonResponse
+from .models import Chat
+model_path = os.path.join(os.path.dirname(__file__), "ml", "models", "vehicle_recommendation_model.pkl")
+model = joblib.load(model_path)
+
+
 
 
 
@@ -78,15 +92,35 @@ def homepage(request):
         'emission_values': emission_values,  # Outer pie (Emissions)
         'daily_labels': daily_labels,
         'daily_values': daily_values,
+        'avg_daily_values': [5, 100, 150, 20, 3453.04, 350.02, 276.47],
         'monthly_labels': monthly_labels,
         'monthly_values': monthly_values,
+        'avg_monthly_values': [5, 10, 15, 20, 8, 12, 7, 9, 14, 22, 17, 30,11, 19, 24, 16, 21, 13, 27, 33, 26, 29, 14,38,42, 50, 2547.04, 334.02, 276.47],
         'total_trips': total_trips,
         'greener_trips': greener_trips,
         'public_trips': public_trips,
-        'total_co2_emission': total_co2_emission
-    }
+        'total_co2_emission': total_co2_emission }
     last_chat = Chat.objects.filter(user=user).order_by('-search_date', '-search_time').first()
-    return render(request, 'mainapp/homepage.html', {'graph_data': json.dumps(graph_data),'chats':last_chat})
+    
+    # Vehicle Prediction
+    best_vehicle_1, best_vehicle_2 = None, None  # Default values
+
+    if last_chat:
+        time = last_chat.duration
+        distance = last_chat.distance
+
+        input_data = np.array([[time, distance]])
+        prediction = model.predict(input_data)
+
+        best_vehicle_1, best_vehicle_2 = prediction[0][0], prediction[0][1]
+
+    return render(request, 'mainapp/homepage.html', {
+        'graph_data': json.dumps(graph_data),
+        'chats': last_chat,
+        'best_vehicle_1': best_vehicle_1,
+        'best_vehicle_2': best_vehicle_2
+    })
+    
 
 
 
@@ -489,7 +523,7 @@ def get_user_stats(request):
 
 
 
-genai.configure(api_key="AIzaSyCZdYc3yTjT0HWSyoQcele55PFY6Hs41QY")
+genai.configure(api_key="AIzaSyDKDcQ2KhFZjvW0XFu5cKeMvu0uLONeJzQ")
 
 @csrf_exempt  # Disable CSRF for simplicity (Better to use tokens in production)
 def chatbot_response(request):
@@ -502,7 +536,7 @@ def chatbot_response(request):
                 return JsonResponse({"error": "No message provided"}, status=400)
 
             # Call Google AI Model
-            model = genai.GenerativeModel("tunedModels/carboniq-chatbot-ggspakmqlsyw")
+            model = genai.GenerativeModel("tunedModels/carboniqchatbot-owu3m910u2w9")
             response = model.generate_content(user_message)
 
             return JsonResponse({"response": response.text})
@@ -571,3 +605,19 @@ def dailychallenge(request):
     return render(request, 'mainapp/dailychallenge.html', {
         "challenges": challenges
     })
+
+
+@login_required(login_url='/login/')
+def redeem(request):
+    user = request.user
+    coin_balance = 0  
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+        coin_balance = user_profile.coins  # Fetch user's coin balance
+        print(f"[DEBUG] Retrieved coin balance: {coin_balance} for user: {user.username}")
+    except UserProfile.DoesNotExist:
+        coin_balance = 0  # If user profile does not exist, set to 0
+        print(f"[DEBUG] UserProfile does not exist for user: {user.username}")
+
+    stores = Store.objects.all()  
+    return render(request, 'mainapp/redeem.html', {'coin_balance': coin_balance,'stores': stores})
